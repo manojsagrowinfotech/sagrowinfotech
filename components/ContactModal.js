@@ -1,9 +1,19 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function ContactModal() {
-  const [open, setOpen] = useState(false)
+export default function ContactModal({ isOpen: controlledOpen, onClose, showButton = true }) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  
+  // Use controlled open state if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  
+  // Sync internal state with controlled prop
+  useEffect(() => {
+    if (controlledOpen !== undefined) {
+      setInternalOpen(controlledOpen)
+    }
+  }, [controlledOpen])
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [mobile, setMobile] = useState('')
@@ -49,25 +59,45 @@ export default function ContactModal() {
       await new Promise((res) => setTimeout(res, 700))
       setSuccess('Thanks — we received your details. We will contact you soon.')
       resetForm()
-      setTimeout(() => setOpen(false), 1200)
+      setTimeout(() => handleClose(), 1200)
     } catch (err) {
       setError(err.message || 'Submission failed')
     } finally { setLoading(false) }
   }
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose()
+    } else {
+      setInternalOpen(false)
+    }
+  }
+
+  const handleOpen = () => {
+    if (onClose) {
+      // If controlled, we can't directly open it - this shouldn't be called when controlled
+      // But for backward compatibility with showButton=true, we use internal state
+      setInternalOpen(true)
+    } else {
+      setInternalOpen(true)
+    }
+  }
+
   return (
     <>
-      <button onClick={() => setOpen(true)} className="btn-primary inline-block">
-        Get Started
-      </button>
+      {showButton && (
+        <button onClick={handleOpen} className="btn-primary inline-block">
+          Get Started
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black opacity-40" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-black opacity-40" onClick={handleClose} />
           <div className="relative w-full max-w-xl mx-4 bg-white rounded-xl shadow-xl p-6">
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-lg font-semibold">Get Started — Contact Form</h3>
-              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+              <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -109,7 +139,7 @@ export default function ContactModal() {
               {success && <div className="text-sm text-green-600">{success}</div>}
 
               <div className="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onClick={() => { resetForm(); setOpen(false) }} className="px-4 py-2 rounded-md border">Cancel</button>
+                <button type="button" onClick={() => { resetForm(); handleClose() }} className="px-4 py-2 rounded-md border">Cancel</button>
                 <button type="submit" disabled={loading} className="btn-primary inline-block">
                   {loading ? 'Sending...' : 'Submit'}
                 </button>

@@ -1,10 +1,24 @@
+'use client'
+
 import Link from 'next/link'
 import FAQAccordion from '@/components/FAQAccordion'
 import ReviewCard from '@/components/ReviewCard'
 import RoleCategory from '@/components/RoleCategory'
 import ContactModal from '@/components/ContactModal'
+import MaintenancePage from '@/components/MaintenancePage'
+import { maintenanceConfig } from '@/config/maintenance'
+import { ContactModalProvider, useContactModal } from '@/components/ContactModalContext'
 
-export default function Home() {
+// Check if maintenance mode is enabled (via config or environment variable)
+const MAINTENANCE_MODE = maintenanceConfig.enabled || process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
+
+function HomeContent() {
+  const { openModal } = useContactModal()
+  
+  // Show maintenance page if maintenance mode is enabled
+  if (MAINTENANCE_MODE) {
+    return <MaintenancePage />
+  }
   const roleCategories = [
     {
       title: 'Technical Development Roles',
@@ -146,7 +160,9 @@ export default function Home() {
                 Transform your career with our comprehensive training programs and expert placement assistance. 
                 We provide the skills, knowledge, and support you need to succeed in today's competitive job market.
               </p>
-              <ContactModal />
+              <Link href="/about" className="btn-primary inline-block">
+                Get Started
+              </Link>
             </div>
             <div className="hidden lg:flex justify-center items-center">
               <div className="w-full h-96 relative rounded-2xl shadow-2xl overflow-hidden bg-white">
@@ -337,9 +353,12 @@ export default function Home() {
               Join thousands of successful professionals who have transformed their careers with us. 
               Your journey to a rewarding career starts here.
             </p>
-            <Link href="#contact" className="bg-white text-primary-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 inline-block text-sm sm:text-base">
+            <button 
+              onClick={openModal}
+              className="bg-white text-primary-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 inline-block text-sm sm:text-base"
+            >
               Start Your Career Journey
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -436,5 +455,13 @@ export default function Home() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <ContactModalProvider>
+      <HomeContent />
+    </ContactModalProvider>
   )
 }

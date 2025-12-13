@@ -1,6 +1,7 @@
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import MaintenancePopupWrapper from '@/components/MaintenancePopupWrapper'
 
 export const metadata = {
   title: 'SAGROINFOTECH - Professional Training & Placement Services',
@@ -11,6 +12,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="antialiased">
+        <MaintenancePopupWrapper />
         <Navbar />
         <main className="min-h-screen">
           {children}
