@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">SAGROWINFOTECH logo icon</title>
+  <desc id="logoDesc">Abstract tech icon in blue-purple gradient representing growth and network.</desc>
+  <defs>
+    <linearGradient id="gp" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#7C3AED" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="40" fill="url(#gp)" opacity="0.95"/>
+  <!-- abstract network / growth mark -->
+  <g transform="translate(48 48)" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 96 C24 56, 72 40, 112 48 C152 56, 192 88, 200 120" opacity="0.95" stroke-width="6" />
+    <circle cx="8" cy="96" r="6" fill="#fff" stroke="none" />
+    <circle cx="72" cy="48" r="6" fill="#fff" stroke="none" />
+    <circle cx="112" cy="56" r="6" fill="#fff" stroke="none" />
+    <circle cx="192" cy="88" r="6" fill="#fff" stroke="none" />
+  </g>
+</svg>

@@ -1,0 +1,110 @@
+<svg width="2400" height="1600" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="gradBlue" x1="0" x2="1">
+      <stop offset="0" stop-color="#2563eb" stop-opacity="1"/>
+      <stop offset="1" stop-color="#1e40af" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="gradPurple" x1="0" x2="1">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="1"/>
+      <stop offset="1" stop-color="#5b21b6" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feOffset dx="0" dy="6"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <!-- Background subtle gradient -->
+  <rect width="1200" height="800" fill="#f6f9ff"/>
+
+  <!-- Decorative soft blobs -->
+  <g opacity="0.10">
+    <ellipse cx="960" cy="120" rx="180" ry="120" fill="#7c3aed"/>
+    <ellipse cx="180" cy="620" rx="240" ry="160" fill="#2563eb"/>
+  </g>
+
+  <!-- Left cluster: trainees and developers -->
+  <g>
+    <!-- Laptop 1 -->
+    <rect x="120" y="420" width="140" height="90" rx="8" fill="#111827" opacity="0.95"/>
+    <rect x="130" y="435" width="120" height="70" rx="6" fill="#0f172a"/>
+    <rect x="130" y="435" width="120" height="70" rx="6" fill="url(#gradBlue)" opacity="0.12"/>
+    <g stroke="#10b981" stroke-width="2">
+      <line x1="140" y1="450" x2="230" y2="450"/>
+      <line x1="140" y1="462" x2="210" y2="462"/>
+    </g>
+    <!-- Person simplified shapes -->
+    <circle cx="190" cy="380" r="28" fill="#f7d4b3"/>
+    <rect x="160" y="410" width="60" height="80" rx="12" fill="#e6eefb"/>
+
+    <!-- Laptop 2 -->
+    <rect x="300" y="430" width="140" height="90" rx="8" fill="#111827" opacity="0.95"/>
+    <rect x="310" y="445" width="120" height="70" rx="6" fill="#0f172a"/>
+    <rect x="310" y="445" width="120" height="70" rx="6" fill="url(#gradPurple)" opacity="0.12"/>
+    <g stroke="#f59e0b" stroke-width="2">
+      <line x1="320" y1="460" x2="400" y2="460"/>
+      <line x1="320" y1="472" x2="380" y2="472"/>
+    </g>
+    <circle cx="360" cy="390" r="26" fill="#e8c9a6"/>
+    <rect x="330" y="420" width="60" height="75" rx="12" fill="#f3f6ff"/>
+  </g>
+
+  <!-- Center-top: Cloud symbol (soft, corporate) -->
+  <g>
+    <ellipse cx="540" cy="160" rx="90" ry="60" fill="#ecf3ff" stroke="#2563eb" stroke-width="2"/>
+    <ellipse cx="490" cy="180" rx="55" ry="40" fill="#ecf3ff" stroke="#2563eb" stroke-width="1.6"/>
+    <ellipse cx="590" cy="180" rx="55" ry="40" fill="#ecf3ff" stroke="#2563eb" stroke-width="1.6"/>
+    <!-- small cloud connections -->
+    <g stroke="#1e40af" stroke-width="1.4" opacity="0.8">
+      <line x1="620" y1="210" x2="700" y2="260" stroke-dasharray="4 4"/>
+    </g>
+  </g>
+
+  <!-- Center: QA / Automation icon (checklist / gear) -->
+  <g>
+    <rect x="480" y="320" width="120" height="80" rx="10" fill="#fff" stroke="#c7ddff" stroke-width="1.5"/>
+    <rect x="495" y="335" width="90" height="8" rx="4" fill="#e6f0ff"/>
+    <rect x="495" y="352" width="60" height="8" rx="4" fill="#e6f0ff"/>
+    <circle cx="595" cy="372" r="10" fill="#2563eb"/>
+    <path d="M588 370 L602 386" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bottom-left: network / nodes -->
+  <g>
+    <circle cx="220" cy="670" r="12" fill="#2563eb"/>
+    <circle cx="340" cy="650" r="12" fill="#7c3aed"/>
+    <circle cx="280" cy="730" r="12" fill="#2563eb"/>
+    <line x1="220" y1="670" x2="340" y2="650" stroke="#9fbffb" stroke-width="2"/>
+    <line x1="220" y1="670" x2="280" y2="730" stroke="#9fbffb" stroke-width="2"/>
+  </g>
+
+  <!-- Right side cluster: AI, Cloud, DevOps, Mobile -->
+  <g>
+    <!-- AI node -->
+    <circle cx="920" cy="200" r="80" fill="#f4efff" stroke="#7c3aed" stroke-width="2"/>
+    <circle cx="920" cy="200" r="34" fill="#7c3aed"/>
+    <g stroke="#ffffff" stroke-width="2" opacity="0.9">
+      <line x1="920" y1="180" x2="920" y2="220"/>
+      <line x1="900" y1="200" x2="940" y2="200"/>
+      <line x1="905" y1="185" x2="935" y2="215" stroke-opacity="0.6"/>
+    </g>
+
+    <!-- Mobile / UX card -->
+    <rect x="800" y="360" width="120" height="200" rx="16" fill="#fff" stroke="#e6e9ff"/>
+    <rect x="815" y="380" width="90" height="150" rx="10" fill="#f6f9ff"/>
+    <circle cx="840" cy="520" r="8" fill="#2563eb"/>
+
+    <!-- DevOps / server stack -->
+    <rect x="980" y="420" width="120" height="20" rx="4" fill="#2563eb" opacity="0.95"/>
+    <rect x="980" y="450" width="120" height="20" rx="4" fill="#2563eb" opacity="0.8"/>
+    <rect x="980" y="480" width="120" height="20" rx="4" fill="#2563eb" opacity="0.6"/>
+  </g>
+
+  <!-- Right-side placement (visual anchor) -->
+  <g>
+    <!-- subtle connecting lines -->
+    <path d="M480 420 C 620 360 760 320 840 320" stroke="#dfeaff" stroke-width="2" fill="none"/>
+  </g>
+
+</svg>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fullLogoTitle fullLogoDesc">
+  <title id="fullLogoTitle">SAGROWINFOTECH full logo</title>
+  <desc id="fullLogoDesc">SAGROWINFOTECH wordmark with abstract tech icon, blue-purple gradient, clean modern sans-serif.</desc>
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#7C3AED" />
+    </linearGradient>
+  </defs>
+  <!-- icon on left -->
+  <g transform="translate(18 18)">
+    <rect width="164" height="164" rx="30" fill="url(#g1)"/>
+    <g transform="translate(36 36)" fill="#fff">
+      <path d="M4 92 C20 52, 68 36, 108 44 C148 52, 188 84, 196 116" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="4" cy="92" r="6" />
+      <circle cx="68" cy="44" r="6" />
+      <circle cx="108" cy="52" r="6" />
+      <circle cx="188" cy="84" r="6" />
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(210 118)">
+    <text x="0" y="0" fill="url(#g1)" font-family="Inter, Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="4">SAGROWINFOTECH</text>
+  </g>
+</svg>
