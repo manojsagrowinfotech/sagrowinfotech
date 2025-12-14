@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Description */}
           <div>
-            <h3 className="text-white text-xl font-bold mb-4">SagroInfotech</h3>
+            <h3 className="text-white text-xl font-bold mb-4">SagrowInfoTech</h3>
             <p className="text-sm leading-relaxed">
               Empowering careers through comprehensive training and placement services. 
               We bridge the gap between education and industry, helping professionals 
@@ -25,12 +25,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
+                <Link href="#about" className="hover:text-white transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Services
                 </Link>
               </li>
@@ -57,27 +57,27 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Services</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Training Programs
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Placement Assistance
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Interview Preparation
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Career Guidance
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link href="#services" className="hover:text-white transition-colors">
                   Certification Support
                 </Link>
               </li>
@@ -121,7 +121,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} SagroInfotech. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} SagrowInfotech. All rights reserved.</p>
         </div>
       </div>
     </footer>

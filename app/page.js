@@ -4,10 +4,11 @@ import Link from 'next/link'
 import FAQAccordion from '@/components/FAQAccordion'
 import ReviewCard from '@/components/ReviewCard'
 import RoleCategory from '@/components/RoleCategory'
+import Services from '@/components/Services'
 import ContactModal from '@/components/ContactModal'
 import MaintenancePage from '@/components/MaintenancePage'
 import { maintenanceConfig } from '@/config/maintenance'
-import { ContactModalProvider, useContactModal } from '@/components/ContactModalContext'
+import { useContactModal } from '@/components/ContactModalContext'
 
 // Check if maintenance mode is enabled (via config or environment variable)
 const MAINTENANCE_MODE = maintenanceConfig.enabled || process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
@@ -185,7 +186,7 @@ function HomeContent() {
               About Us
             </h2>
             <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8">
-              SagroInfotech is a leading training and placement organization dedicated to empowering 
+              SagrowInfotech is a leading training and placement organization dedicated to empowering 
               professionals and freshers with industry-relevant skills and career opportunities. We 
               understand the challenges of transitioning from education to industry, and we're here 
               to bridge that gap with comprehensive support at every step of your journey.
@@ -238,6 +239,11 @@ function HomeContent() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Services Section (embedded) */}
+      <section id="services">
+        <Services />
       </section>
 
       {/* Career Kickstart Section */}
@@ -459,9 +465,5 @@ function HomeContent() {
 }
 
 export default function Home() {
-  return (
-    <ContactModalProvider>
-      <HomeContent />
-    </ContactModalProvider>
-  )
+  return <HomeContent />
 }

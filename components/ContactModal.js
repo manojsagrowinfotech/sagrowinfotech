@@ -96,7 +96,7 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
           <div className="absolute inset-0 bg-black opacity-40" onClick={handleClose} />
           <div className="relative w-full max-w-xl mx-4 bg-white rounded-xl shadow-xl p-6">
             <div className="flex items-start justify-between mb-4">
-              <h3 className="text-lg font-semibold">Get Started — Contact Form</h3>
+              <h3 className="text-lg font-semibold">Student Details</h3>
               <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
 
