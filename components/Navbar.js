@@ -15,9 +15,9 @@ export default function Navbar() {
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo: icon + uppercase text */}
-          <Link href="/" className="flex items-center space-x-3">
-            <img src="/images/logo-icon.svg" alt="SAGROWINFOTECH logo" className="h-10 w-10" />
-            <span className="text-xl font-extrabold tracking-widest text-primary-600">SAGROWINFOTECH</span>
+          <Link href="/" className="flex items-center space-x-4">
+            <img src="/images/logo-sagrowinfotech-badge.svg" alt="Sagrow Infotech" className="h-14 w-auto md:h-16" />
+            <span className="text-2xl md:text-3xl font-extrabold tracking-widest text-primary-600">SAGROWINFOTECH</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -25,10 +25,10 @@ export default function Navbar() {
             <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Home
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <Link href="#about" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               About
             </Link>
-            <Link href="/services" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <Link href="#services" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
               Services
             </Link>
             <Link href="#alumni-review" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
@@ -78,14 +78,14 @@ export default function Navbar() {
                 Home
               </Link>
               <Link
-                href="/about"
+                href="#about"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
               >
                 About
               </Link>
               <Link
-                href="/services"
+                href="#services"
                 onClick={() => setIsOpen(false)}
                 className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
               >
