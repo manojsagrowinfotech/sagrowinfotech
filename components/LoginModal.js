@@ -149,7 +149,12 @@ export default function LoginModal({ isOpen, onClose }) {
         </button>
         <div className="pt-8 px-6 sm:px-8 text-center bg-gradient-to-b from-primary-50 to-white">
           <div className="flex flex-col items-center gap-3">
-            <img src="/images/logo-sagrowinfotech-badge.svg" alt="SAGROWINFOTECH" className="w-20 h-20 drop-shadow-sm" />
+         <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 22c0-3.866 4.477-7 9-7s9 3.134 9 7" />
+                  </svg>
+                </div>
             <div className="text-xl font-bold text-primary-900">{view === 'login' ? 'USER LOGIN' : view === 'forgot' ? 'FORGOT PASSWORD' : 'RESET PASSWORD'}</div>
           </div>
         </div>

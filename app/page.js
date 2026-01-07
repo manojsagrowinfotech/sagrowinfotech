@@ -152,9 +152,13 @@ function HomeContent() {
                 Transform your career with our comprehensive placement programs and expert technical guidance. 
                 We provide the skills, knowledge, and support you need to succeed in today's competitive job market.
               </p>
-              <Link href="/about" className="btn-primary inline-block">
-                Get Started
-              </Link>
+
+  <button
+    onClick={openModal}
+    className="bg-primary-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors duration-200 inline-block text-sm sm:text-base"
+  >
+    Get Started
+  </button>
             </div>
             <div className="hidden lg:flex justify-center items-center">
               <div className="w-full h-96 relative rounded-2xl shadow-2xl overflow-hidden bg-white">
@@ -350,12 +354,6 @@ function HomeContent() {
               Join thousands of successful professionals who have transformed their careers with us. 
               Your journey to a rewarding career starts here.
             </p>
-            <button 
-              onClick={openModal}
-              className="bg-white text-primary-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200 inline-block text-sm sm:text-base"
-            >
-              Start Your Career Journey
-            </button>
           </div>
         </div>
       </section>
@@ -395,29 +393,74 @@ function HomeContent() {
       {/* Contact Section */}
       <section className="py-12 sm:py-16 md:py-20 bg-white px-3 sm:px-4 md:px-6 lg:px-8" id="contact">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">Get in Touch</h2>
-            <p className="text-base sm:text-lg text-gray-700 mb-6 sm:mb-8 leading-relaxed px-2">Ready to take the next step in your career? We're here to help. Reach out to us and let's discuss how we can support your professional growth.</p>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">Get in Touch</h2>
+            <p className="text-base sm:text-lg text-gray-700 mt-3 sm:mt-4 leading-relaxed px-2">
+              Ready to take the next step in your career? We're here to help. Reach out to us and let's discuss how we can support your professional growth.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div className="bg-gray-50 rounded-lg p-4 sm:p-6 md:p-8 border border-gray-200">
               <div className="space-y-4 sm:space-y-6 text-left">
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Address</h3>
-<p className="text-sm sm:text-base text-gray-700">
-  Sagrow Infotech,<br />
-  2nd Floor, Kesavan Apartment,<br />
-  Opposite AARTI Scan Hospital,<br />
-  Velachery, Chennai – 600042
-</p>
-
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Address</h3>
+                  </div>
+                  <p className="text-sm sm:text-base text-gray-700">
+                    Sagrow Infotech,<br />
+                    2nd Floor, Kesavan Apartment,<br />
+                    Opposite AARTI Scan Hospital,<br />
+                    Velachery, Chennai – 600042
+                  </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Email</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Email</h3>
+                  </div>
                   <a href="mailto:manoj@sagrowinfotech.com" className="text-primary-600 hover:text-primary-700 text-sm sm:text-base">manoj@sagrowinfotech.com</a>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Phone</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h2a2 2 0 012 2v3a2 2 0 01-2 2H4l-1 1a12 12 0 006 6l1-1v-1a2 2 0 012-2h3a2 2 0 012 2v2a2 2 0 01-2 2h-1C10.477 21 3 13.523 3 5z" />
+                    </svg>
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Phone</h3>
+                  </div>
                   <a href="tel:+91 883 888 8143" className="text-primary-600 hover:text-primary-700 text-sm sm:text-base">+91 861 037 1565</a>
                 </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+              <div className="aspect-video w-full">
+                <iframe
+                  title="Sagrow Infotech Location"
+                  src="https://maps.google.com/maps?q=Velachery%20Chennai%20600042&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="p-3 sm:p-4 text-right">
+                <a
+                  href="https://maps.app.goo.gl/tf73zQeSSjucmZnu5?g_st=awb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 text-sm sm:text-base"
+                >
+                  Open in Google Maps
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 3h7v7M21 3l-9 9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 21H3v-7" />
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
