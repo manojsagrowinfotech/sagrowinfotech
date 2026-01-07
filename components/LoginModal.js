@@ -13,10 +13,15 @@ export default function LoginModal({ isOpen, onClose }) {
   const [view, setView] = useState('login'); // 'login' | 'forgot' | 'reset'
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [newPasswordError, setNewPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -29,6 +34,10 @@ export default function LoginModal({ isOpen, onClose }) {
       setRemember(false);
       setEmailError('');
       setPasswordError('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setNewPasswordError('');
+      setConfirmPasswordError('');
     }
   }, [isOpen]);
 
@@ -83,7 +92,12 @@ export default function LoginModal({ isOpen, onClose }) {
         setSuccess('If an account exists with this email, a reset link has been sent.');
       }
     } catch (err) {
-      setError('Failed to send reset link. Please try again.');
+      const msg = err?.response?.data?.message || err?.message || '';
+      if (typeof msg === 'string' && /user not found/i.test(msg)) {
+        setEmailError('The provided email address is not registered. Please enter a valid registered email address.');
+      } else {
+        setError('Failed to send reset link. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -92,11 +106,23 @@ export default function LoginModal({ isOpen, onClose }) {
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setNewPasswordError('');
+    setConfirmPasswordError('');
     setIsLoading(true);
     try {
+      if (!newPassword || newPassword.trim() === '' || newPassword.length < 6) {
+        setNewPasswordError('Enter at least 6 characters');
+        return;
+      }
+      if (!confirmPassword || confirmPassword !== newPassword) {
+        setConfirmPasswordError('Passwords do not match');
+        return;
+      }
       await authApi.resetPassword({ resetToken, newPassword });
       setSuccess('Password reset successful. Please login.');
       setView('login');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (err) {
       setError('Failed to reset password. Please check your token.');
     } finally {
@@ -124,7 +150,7 @@ export default function LoginModal({ isOpen, onClose }) {
         <div className="pt-8 px-6 sm:px-8 text-center bg-gradient-to-b from-primary-50 to-white">
           <div className="flex flex-col items-center gap-3">
             <img src="/images/logo-sagrowinfotech-badge.svg" alt="SAGROWINFOTECH" className="w-20 h-20 drop-shadow-sm" />
-            <div className="text-xl font-bold text-primary-900">USER LOGIN</div>
+            <div className="text-xl font-bold text-primary-900">{view === 'login' ? 'USER LOGIN' : view === 'forgot' ? 'FORGOT PASSWORD' : 'RESET PASSWORD'}</div>
           </div>
         </div>
         <div className="p-6 sm:p-8 pt-4">
@@ -236,12 +262,15 @@ export default function LoginModal({ isOpen, onClose }) {
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                    className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all ${emailError ? 'border-red-400 focus:ring-red-500' : 'focus:ring-primary-500'}`}
                     placeholder="you@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError(''); }}
                     required
                   />
+                  {emailError && (
+                    <p className="mt-1 text-xs text-red-600">{emailError}</p>
+                  )}
                 </div>
                 <button
                   type="submit"
@@ -250,7 +279,7 @@ export default function LoginModal({ isOpen, onClose }) {
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  {isLoading ? 'Sending...' : 'Send Reset Link'}
+                  {isLoading ? 'Submiting...' : 'Submit'}
                 </button>
                 <div className="text-center mt-2">
                   <button type="button" onClick={() => toggleView('login')} className="text-sm font-medium text-primary-600 hover:text-primary-800">
@@ -261,32 +290,80 @@ export default function LoginModal({ isOpen, onClose }) {
             ) : (
               <form onSubmit={handleResetSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="resetToken">
-                    Reset Token
-                  </label>
-                  <input
-                    id="resetToken"
-                    type="text"
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                    placeholder="Enter reset token"
-                    value={resetToken}
-                    onChange={(e) => setResetToken(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
                   <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="newPassword">
                     New Password
                   </label>
-                  <input
-                    id="newPassword"
-                    type="password"
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                    placeholder="••••••••"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      id="newPassword"
+                      type={showNewPassword ? 'text' : 'password'}
+                      className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all pr-12 ${newPasswordError ? 'border-red-400 focus:ring-red-500' : 'focus:ring-primary-500'}`}
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => { setNewPassword(e.target.value); if (newPasswordError) setNewPasswordError(''); }}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showNewPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {newPasswordError && (
+                    <p className="mt-1 text-xs text-red-600">{newPasswordError}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="confirmPassword">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all pr-12 ${confirmPasswordError ? 'border-red-400 focus:ring-red-500' : 'focus:ring-primary-500'}`}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => { setConfirmPassword(e.target.value); if (confirmPasswordError) setConfirmPasswordError(''); }}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {confirmPasswordError && (
+                    <p className="mt-1 text-xs text-red-600">{confirmPasswordError}</p>
+                  )}
                 </div>
                 <button
                   type="submit"
