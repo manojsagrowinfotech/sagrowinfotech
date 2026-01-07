@@ -18,20 +18,46 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [mobile, setMobile] = useState('')
-  const [experience, setExperience] = useState('Fresher')
-  const [years, setYears] = useState(1)
-  const [state, setState] = useState('Andhra Pradesh')
+  const [experience, setExperience] = useState('FRESHER')
+  const [years, setYears] = useState('')
+  const [state, setState] = useState('')
+  const [states, setStates] = useState([])
+  const [levels, setLevels] = useState([])
+  const [yearsOptions, setYearsOptions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+
+  useEffect(() => {
+    async function loadOptions() {
+      try {
+        const [s, l, y] = await Promise.all([
+          studentApi.getStates(),
+          studentApi.getExperienceLevels(),
+          studentApi.getYearsOfExperience(),
+        ])
+        const statesData = s?.data?.states || []
+        const levelsData = l?.data?.experienceLevels || []
+        const yearsData = y?.data?.yearsOfExperience || []
+        setStates(statesData)
+        setLevels(levelsData)
+        setYearsOptions(yearsData)
+        if (!state && statesData.length) setState(statesData[0].key)
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load options', e)
+      }
+    }
+    loadOptions()
+  }, [])
 
   function resetForm() {
     setName('')
     setEmail('')
     setMobile('')
-    setExperience('Fresher')
-    setYears(1)
-    setState('Andhra Pradesh')
+    setExperience('FRESHER')
+    setYears('')
+    setState(states[0]?.key || '')
     setError(null)
     setSuccess(null)
   }
@@ -40,29 +66,9 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
     if (!name.trim()) return 'Please enter your name.'
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email.'
     if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile)) return 'Please enter a valid mobile number.'
-    if (experience === 'Experienced' && (!years || years < 1)) return 'Please select years of experience.'
-    if (!state.trim()) return 'Please select your state.'
+    if (experience === 'EXPERIENCED' && !years) return 'Please select years of experience.'
+    if (!state) return 'Please select your state.'
     return null
-  }
-
-  function toEnum(value) {
-    return value.toUpperCase().replace(/\s+/g, '_')
-  }
-
-  function yearsToEnum(y) {
-    const map = {
-      1: 'ONE_YEAR',
-      2: 'TWO_YEARS',
-      3: 'THREE_YEARS',
-      4: 'FOUR_YEARS',
-      5: 'FIVE_YEARS',
-      6: 'SIX_YEARS',
-      7: 'SEVEN_YEARS',
-      8: 'EIGHT_YEARS',
-      9: 'NINE_YEARS',
-      10: 'TEN_PLUS_YEARS',
-    }
-    return map[y] || 'ONE_YEAR'
   }
 
   async function handleSubmit(e) {
@@ -77,11 +83,11 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
         name,
         mobileNo: mobile,
         emailId: email,
-        experienceLevel: experience === 'Experienced' ? 'EXPERIENCED' : 'FRESHER',
-        state: toEnum(state),
+        experienceLevel: experience,
+        state,
       }
-      if (experience === 'Experienced') {
-        payload.yearsOfExperience = yearsToEnum(years)
+      if (experience === 'EXPERIENCED') {
+        payload.yearsOfExperience = years
       }
       const res = await studentApi.createStudent(payload)
       const msg = res?.data?.message || 'Student created successfully'
@@ -147,15 +153,8 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                 <select value={state} onChange={(e) => setState(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                  {[
-                    'Andhra Pradesh',
-                    'Karnataka',
-                    'Maharashtra',
-                    'Tamil Nadu',
-                    'Telangana',
-                    'Delhi',
-                  ].map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                  {states.map((s) => (
+                    <option key={s.key} value={s.key}>{s.label}</option>
                   ))}
                 </select>
               </div>
@@ -163,17 +162,27 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Experience Level</label>
                 <select value={experience} onChange={(e) => setExperience(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                  <option>Fresher</option>
-                  <option>Experienced</option>
+                  {levels.length ? levels.map((l)=>(
+                    <option key={l.key} value={l.key}>{l.label}</option>
+                  )) : (
+                    <>
+                      <option key="FRESHER" value="FRESHER">Fresher</option>
+                      <option key="EXPERIENCED" value="EXPERIENCED">Experienced</option>
+                    </>
+                  )}
                 </select>
               </div>
 
-              {experience === 'Experienced' && (
+              {experience === 'EXPERIENCED' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                  <select value={years} onChange={(e) => setYears(Number(e.target.value))} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                    {Array.from({length:10}, (_,i)=>i+1).map(y=> (
-                      <option key={y} value={y}>{y === 10 ? '10+ years' : `${y} year${y>1?'s':''}`}</option>
+                  <select value={years} onChange={(e) => setYears(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
+                    {yearsOptions.length ? yearsOptions.map((o)=>(
+                      <option key={o.key} value={o.key}>
+                        {o.label}
+                      </option>
+                    )) : Array.from({length:10}, (_,i)=>String(i+1)).map(y=> (
+                      <option key={y} value={y}>{y === '10' ? '10+ years' : `${y} year${y>'1'?'s':''}`}</option>
                     ))}
                   </select>
                 </div>

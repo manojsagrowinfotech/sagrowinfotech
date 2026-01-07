@@ -8,15 +8,6 @@ import { studentApi, excelApi } from '@/lib/api';
 import UpdateProfileModal from '@/components/UpdateProfileModal';
 import ChangePasswordModal from '@/components/ChangePasswordModal';
 
-// Mock Data for demonstration if API fails
-const MOCK_STUDENTS = [
-  { id: 1, name: 'Alice Johnson', mobile: '9876543210', email: 'alice@example.com', state: 'Karnataka', experience: '2 Years' },
-  { id: 2, name: 'Bob Smith', mobile: '8765432109', email: 'bob@example.com', state: 'Maharashtra', experience: 'Fresher' },
-  { id: 3, name: 'Charlie Brown', mobile: '7654321098', email: 'charlie@example.com', state: 'Tamil Nadu', experience: '1 Year' },
-  { id: 4, name: 'David Lee', mobile: '6543210987', email: 'david@example.com', state: 'Telangana', experience: '3 Years' },
-  { id: 5, name: 'Eve Wilson', mobile: '5432109876', email: 'eve@example.com', state: 'Delhi', experience: 'Fresher' },
-];
-
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
@@ -294,44 +285,65 @@ export default function Dashboard() {
       </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">Student Details</h2>
         </div>
-        
         {isLoadingStudents ? (
-           <div className="p-8 text-center">
-             <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
-             <p className="mt-2 text-gray-500">Loading student data...</p>
-           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile Number</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email ID</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.mobileNo}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.emailId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.state}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {(student.experienceLevel || '').toLowerCase().startsWith('f')
-                        ? 'Fresher'
-                        : `Experienced${student.yearsOfExperience ? ` (${student.yearsOfExperience})` : ''}`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
+            <p className="mt-2 text-gray-500">Loading student data...</p>
           </div>
+        ) : (
+          <>
+            <div className="md:hidden p-4 space-y-3">
+              {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
+                <div key={student.id} className="border rounded-lg p-3 bg-white">
+                  <div className="flex justify-between">
+                    <p className="font-semibold text-gray-900">{student.name}</p>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-700">
+                      {(student.experienceLevel || '').toLowerCase().startsWith('f') ? 'Fresher' : 'Experienced'}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-700">
+                    <p>Mobile: <span className="text-gray-900">{student.mobileNo}</span></p>
+                    <p>Email: <span className="text-gray-900">{student.emailId}</span></p>
+                    <p>State: <span className="text-gray-900">{student.state}</span></p>
+                    {student.yearsOfExperience && (
+                      <p>Years: <span className="text-gray-900">{student.yearsOfExperience}</span></p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile Number</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email ID</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
+                    <tr key={student.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.mobileNo}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.emailId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.state}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {(student.experienceLevel || '').toLowerCase().startsWith('f')
+                          ? 'Fresher'
+                          : `Experienced${student.yearsOfExperience ? ` (${student.yearsOfExperience})` : ''}`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
       
@@ -359,5 +371,5 @@ export default function Dashboard() {
       <UpdateProfileModal isOpen={isUpdateProfileOpen} onClose={() => setIsUpdateProfileOpen(false)} />
       <ChangePasswordModal isOpen={isChangePasswordOpen} onClose={() => setIsChangePasswordOpen(false)} />
     </div>
-  );
-}
+    );
+  }

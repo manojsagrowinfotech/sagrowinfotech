@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { studentApi } from '@/lib/api';
 
 export default function UpdateProfileModal({ isOpen, onClose }) {
   const { user, updateUserProfile } = useAuth();
   const [name, setName] = useState('');
   const [mobileNo, setMobileNo] = useState('');
   const [state, setState] = useState('');
+  const [states, setStates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -18,6 +20,19 @@ export default function UpdateProfileModal({ isOpen, onClose }) {
       setState(user.state || '');
     }
   }, [user]);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const res = await studentApi.getStates();
+        setStates(res?.data?.states || []);
+        if (!state && res?.data?.states?.length) setState(res.data.states[0].key);
+      } catch (e) {
+        setError('Failed to fetch states');
+      }
+    };
+    fetchStates();
+  }, []);
 
   if (!isOpen) return null;
 
@@ -89,14 +104,19 @@ export default function UpdateProfileModal({ isOpen, onClose }) {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="state">
               State
             </label>
-            <input
+            <select
               id="state"
-              type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={state}
               onChange={(e) => setState(e.target.value)}
               required
-            />
+            >
+              {states.map((s) => (
+                <option key={s.key} value={s.key}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
           </div>
  
           <button
