@@ -27,6 +27,11 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [nameError, setNameError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [mobileError, setMobileError] = useState('')
+  const [stateError, setStateError] = useState('')
+  const [yearsError, setYearsError] = useState('')
 
   useEffect(() => {
     async function loadOptions() {
@@ -60,23 +65,34 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
     setState(states[0]?.key || '')
     setError(null)
     setSuccess(null)
+    setNameError('')
+    setEmailError('')
+    setMobileError('')
+    setStateError('')
+    setYearsError('')
   }
 
   function validate() {
-    if (!name.trim()) return 'Please enter your name.'
-    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) return 'Please enter a valid email.'
-    if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile)) return 'Please enter a valid mobile number.'
-    if (experience === 'EXPERIENCED' && !years) return 'Please select years of experience.'
-    if (!state) return 'Please select your state.'
-    return null
+    setNameError('')
+    setEmailError('')
+    setMobileError('')
+    setStateError('')
+    setYearsError('')
+    let hasError = false
+    if (!name.trim()) { setNameError('Please enter your name'); hasError = true }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Please enter a valid email Id'); hasError = true }
+    if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile)) { setMobileError('Please enter a valid mobile number'); hasError = true }
+    if (!state) { setStateError('Please select your state'); hasError = true }
+    if (experience === 'EXPERIENCED' && !years) { setYearsError('Please select years of experience'); hasError = true }
+    return !hasError
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
     setSuccess(null)
-    const v = validate()
-    if (v) { setError(v); return }
+    const ok = validate()
+    if (!ok) { return }
     setLoading(true)
     try {
       const payload = {
@@ -126,78 +142,123 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black opacity-40" onClick={handleClose} />
-          <div className="relative w-full max-w-xl mx-4 bg-white rounded-xl shadow-xl p-6">
-            <div className="flex items-start justify-between mb-4">
-              <h3 className="text-lg font-semibold">Student Details</h3>
-              <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">✕</button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 sm:mx-4 p-0 relative overflow-hidden border border-primary-100">
+            <button
+              onClick={handleClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-primary-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="pt-4 px-5 sm:px-6 text-center bg-gradient-to-b from-primary-50 to-white">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 22c0-3.866 4.477-7 9-7s9 3.134 9 7" />
+                  </svg>
+                </div>
+                <div className="text-lg font-bold text-primary-900">Candidate Placement Details</div>
+              </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email ID</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="w-full rounded-md border border-gray-300 px-3 py-2" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                <input value={mobile} onChange={(e) => setMobile(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <select value={state} onChange={(e) => setState(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                  {states.map((s) => (
-                    <option key={s.key} value={s.key}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Experience Level</label>
-                <select value={experience} onChange={(e) => setExperience(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                  {levels.length ? levels.map((l)=>(
-                    <option key={l.key} value={l.key}>{l.label}</option>
-                  )) : (
-                    <>
-                      <option key="FRESHER" value="FRESHER">Fresher</option>
-                      <option key="EXPERIENCED" value="EXPERIENCED">Experienced</option>
-                    </>
-                  )}
-                </select>
-              </div>
-
-              {experience === 'EXPERIENCED' && (
+            <div className="p-4 sm:p-6 pt-3">
+              <div className="h-1 bg-gradient-to-r from-primary-400 to-primary-700 rounded-full mb-4"></div>
+              {error && <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2.5 rounded-lg mb-3 text-sm font-medium">{error}</div>}
+              {success && <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2.5 rounded-lg mb-3 text-sm font-medium">{success}</div>}
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                  <select value={years} onChange={(e) => setYears(e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2">
-                    {yearsOptions.length ? yearsOptions.map((o)=>(
-                      <option key={o.key} value={o.key}>
-                        {o.label}
-                      </option>
-                    )) : Array.from({length:10}, (_,i)=>String(i+1)).map(y=> (
-                      <option key={y} value={y}>{y === '10' ? '10+ years' : `${y} year${y>'1'?'s':''}`}</option>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">Name</label>
+                  <input
+                    value={name}
+                    onChange={(e) => { setName(e.target.value); if (nameError) setNameError('') }}
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${nameError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                  />
+                  {nameError && <p className="mt-1 text-xs text-red-600">{nameError}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">Email ID</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${emailError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                  />
+                  {emailError && <p className="mt-1 text-xs text-red-600">{emailError}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">Mobile Number</label>
+                  <input
+                    value={mobile}
+                    onChange={(e) => { setMobile(e.target.value); if (mobileError) setMobileError('') }}
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${mobileError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                  />
+                  {mobileError && <p className="mt-1 text-xs text-red-600">{mobileError}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">State</label>
+                  <select
+                    value={state}
+                    onChange={(e) => { setState(e.target.value); if (stateError) setStateError('') }}
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${stateError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                  >
+                    {states.map((s) => (
+                      <option key={s.key} value={s.key}>{s.label}</option>
                     ))}
                   </select>
+                  {stateError && <p className="mt-1 text-xs text-red-600">{stateError}</p>}
                 </div>
-              )}
 
-              {error && <div className="text-sm text-red-600">{error}</div>}
-              {success && <div className="text-sm text-green-600">{success}</div>}
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">Experience Level</label>
+                  <select
+                    value={experience}
+                    onChange={(e) => { setExperience(e.target.value); setYearsError('') }}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all focus:ring-2 focus:ring-primary-500"
+                  >
+                    {levels.length ? levels.map((l)=>(
+                      <option key={l.key} value={l.key}>{l.label}</option>
+                    )) : (
+                      <>
+                        <option key="FRESHER" value="FRESHER">Fresher</option>
+                        <option key="EXPERIENCED" value="EXPERIENCED">Experienced</option>
+                      </>
+                    )}
+                  </select>
+                </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button type="button" onClick={() => { resetForm(); handleClose() }} className="px-4 py-2 rounded-md border">Cancel</button>
-                <button type="submit" disabled={loading} className="btn-primary inline-block">
-                  {loading ? 'Sending...' : 'Submit'}
-                </button>
-              </div>
-            </form>
+                {experience === 'EXPERIENCED' && (
+                  <div>
+                    <label className="block text-primary-900 text-sm font-semibold mb-1.5">Years of Experience</label>
+                    <select
+                      value={years}
+                      onChange={(e) => { setYears(e.target.value); if (yearsError) setYearsError('') }}
+                      className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${yearsError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                    >
+                      {yearsOptions.length ? yearsOptions.map((o)=>(
+                        <option key={o.key} value={o.key}>
+                          {o.label}
+                        </option>
+                      )) : Array.from({length:10}, (_,i)=>String(i+1)).map(y=> (
+                        <option key={y} value={y}>{y === '10' ? '10+ years' : `${y} year${y>'1'?'s':''}`}</option>
+                      ))}
+                    </select>
+                    {yearsError && <p className="mt-1 text-xs text-red-600">{yearsError}</p>}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button type="button" onClick={() => { resetForm(); handleClose() }} className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                  <button type="submit" disabled={loading} className={`px-3 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 shadow-md shadow-primary-200 transition-all active:scale-[0.98] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {loading ? 'Sending...' : 'Submit'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
