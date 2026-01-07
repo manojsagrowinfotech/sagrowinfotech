@@ -402,7 +402,13 @@ function HomeContent() {
               <div className="space-y-4 sm:space-y-6 text-left">
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Address</h3>
-                  <p className="text-sm sm:text-base text-gray-700">123 Training Center,<br />Business District,<br />City, State - 123456</p>
+<p className="text-sm sm:text-base text-gray-700">
+  Sagrow Infotech,<br />
+  2nd Floor, Kesavan Apartment,<br />
+  Opposite AARTI Scan Hospital,<br />
+  Velachery, Chennai – 600042
+</p>
+
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Email</h3>
@@ -410,7 +416,7 @@ function HomeContent() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Phone</h3>
-                  <a href="tel:+91 883 888 8143" className="text-primary-600 hover:text-primary-700 text-sm sm:text-base">+91 883 888 8143</a>
+                  <a href="tel:+91 883 888 8143" className="text-primary-600 hover:text-primary-700 text-sm sm:text-base">+91 861 037 1565</a>
                 </div>
               </div>
             </div>

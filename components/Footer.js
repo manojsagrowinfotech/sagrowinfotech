@@ -89,7 +89,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Get in Touch</h4>
             <ul className="space-y-2 text-sm mb-4">
               <li>Email: manoj@sagrowinfotech.com</li>
-              <li>Phone: +91 883 888 8143</li>
+              <li>Phone: +91 861 037 1565</li>
               <li className="pt-2">
                 <Link href="#contact" className="hover:text-white transition-colors underline">
                   Contact Us
