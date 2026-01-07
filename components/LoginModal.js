@@ -14,6 +14,9 @@ export default function LoginModal({ isOpen, onClose }) {
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -24,6 +27,8 @@ export default function LoginModal({ isOpen, onClose }) {
       setSuccess('');
       setView('login');
       setRemember(false);
+      setEmailError('');
+      setPasswordError('');
     }
   }, [isOpen]);
 
@@ -32,15 +37,16 @@ export default function LoginModal({ isOpen, onClose }) {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setEmailError('');
+    setPasswordError('');
     
-    // Validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(username)) {
-      setError('Please enter a valid email address');
+    if (!username || username.trim() === '' || !emailRegex.test(username)) {
+      setEmailError('Please enter a valid email address');
       return;
     }
-    if (!password || password.trim() === '') {
-      setError('Password is required');
+    if (!password || password.trim() === '' || password.length < 6) {
+      setPasswordError('Enter at least 6 characters');
       return;
     }
 
@@ -105,99 +111,132 @@ export default function LoginModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 sm:mx-6 p-0 relative overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 sm:mx-6 p-0 relative overflow-hidden border border-primary-100">
         <button
           onClick={() => { onClose(); setView('login'); }}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-primary-600 transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="grid md:grid-cols-2">
-          <div className="p-6 sm:p-8">
-            <h2 className="text-2xl font-bold mb-1 text-gray-900">Login</h2>
+        <div className="pt-8 px-6 sm:px-8 text-center bg-gradient-to-b from-primary-50 to-white">
+          <div className="flex flex-col items-center gap-3">
+            <img src="/images/logo-sagrowinfotech-badge.svg" alt="SAGROWINFOTECH" className="w-20 h-20 drop-shadow-sm" />
+            <div className="text-xl font-bold text-primary-900">USER LOGIN</div>
+          </div>
+        </div>
+        <div className="p-6 sm:p-8 pt-4">
+          <div>
+            <div className="h-1.5 bg-gradient-to-r from-primary-400 to-primary-700 rounded-full mb-6"></div>
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm font-medium">
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm">
+              <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg mb-4 text-sm font-medium">
                 {success}
               </div>
             )}
 
             {view === 'login' ? (
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <form onSubmit={handleLoginSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-                    Email Address
+                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="username">
+                    Username
                   </label>
                   <input
                     id="username"
                     type="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all ${emailError ? 'border-red-400 focus:ring-red-500' : 'focus:ring-primary-500'}`}
                     placeholder="you@example.com"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => { setUsername(e.target.value); if (emailError) setEmailError(''); }}
                     required
                   />
+                  {emailError && (
+                    <p className="mt-1 text-xs text-red-600">{emailError}</p>
+                  )}
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-gray-700 text-sm font-bold" htmlFor="password">
+                    <label className="block text-primary-900 text-sm font-semibold" htmlFor="password">
                       Password
                     </label>
-                    <button type="button" onClick={() => toggleView('forgot')} className="text-xs text-primary-600 hover:text-primary-800">
+                    <button type="button" onClick={() => toggleView('forgot')} className="text-xs font-medium text-primary-600 hover:text-primary-800">
                       Forgot Password?
                     </button>
                   </div>
-                  <input
-                    id="password"
-                    type="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Enter 6 character or more"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showLoginPassword ? 'text' : 'password'}
+                      className={`w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-all pr-12 ${passwordError ? 'border-red-400 focus:ring-red-500' : 'focus:ring-primary-500'}`}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); if (passwordError) setPasswordError(''); }}
+                      required
+                    />
+                    {passwordError && (
+                      <p className="mt-1 text-xs text-red-600">{passwordError}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                      aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showLoginPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <line x1="1" y1="1" x2="23" y2="23" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="rounded border-gray-300" />
-                  <label htmlFor="remember" className="text-sm text-gray-700">Remember me</label>
+                  <input 
+                    id="remember" 
+                    type="checkbox" 
+                    checked={remember} 
+                    onChange={(e) => setRemember(e.target.checked)} 
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500" 
+                  />
+                  <label htmlFor="remember" className="text-sm text-gray-600 font-medium">Remember me</label>
                 </div>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full bg-primary-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-primary-700 transition-colors ${
+                  className={`w-full bg-primary-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-200 transition-all active:scale-[0.98] ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   {isLoading ? 'Logging in...' : 'LOGIN'}
                 </button>
-                <div className="flex items-center gap-2 my-2">
-                  <div className="h-px bg-gray-200 flex-1"></div>
-                  <span className="text-xs text-gray-500">or login with</span>
-                  <div className="h-px bg-gray-200 flex-1"></div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button type="button" className="border border-gray-300 rounded-md py-2 font-medium text-gray-700 hover:bg-gray-50">Google</button>
-                  <button type="button" className="border border-gray-300 rounded-md py-2 font-medium text-gray-700 hover:bg-gray-50">Facebook</button>
-                </div>
               </form>
             ) : view === 'forgot' ? (
-              <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <p className="text-sm text-gray-600 mb-2">Enter your email to receive a reset token.</p>
+              <form onSubmit={handleForgotSubmit} className="space-y-5">
+<p className="text-sm font-medium text-gray-500 mb-2">
+  Enter your registered email address
+</p>
+
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                    Email
+                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="email">
+                    Email Id
                   </label>
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -207,28 +246,28 @@ export default function LoginModal({ isOpen, onClose }) {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full bg-primary-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-primary-700 transition-colors ${
+                  className={`w-full bg-primary-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-200 transition-all active:scale-[0.98] ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   {isLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
                 <div className="text-center mt-2">
-                  <button type="button" onClick={() => toggleView('login')} className="text-sm text-primary-600 hover:text-primary-800">
+                  <button type="button" onClick={() => toggleView('login')} className="text-sm font-medium text-primary-600 hover:text-primary-800">
                     Back to Login
                   </button>
                 </div>
               </form>
             ) : (
-              <form onSubmit={handleResetSubmit} className="space-y-4">
+              <form onSubmit={handleResetSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resetToken">
+                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="resetToken">
                     Reset Token
                   </label>
                   <input
                     id="resetToken"
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                     placeholder="Enter reset token"
                     value={resetToken}
                     onChange={(e) => setResetToken(e.target.value)}
@@ -236,14 +275,14 @@ export default function LoginModal({ isOpen, onClose }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="newPassword">
+                  <label className="block text-primary-900 text-sm font-semibold mb-2" htmlFor="newPassword">
                     New Password
                   </label>
                   <input
                     id="newPassword"
                     type="password"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Enter new password"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                    placeholder="••••••••"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -252,33 +291,19 @@ export default function LoginModal({ isOpen, onClose }) {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full bg-primary-600 text-white font-bold py-2.5 px-4 rounded-md hover:bg-primary-700 transition-colors ${
+                  className={`w-full bg-primary-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-200 transition-all active:scale-[0.98] ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   {isLoading ? 'Resetting...' : 'Reset Password'}
                 </button>
                 <div className="text-center mt-2">
-                  <button type="button" onClick={() => toggleView('login')} className="text-sm text-primary-600 hover:text-primary-800">
+                  <button type="button" onClick={() => toggleView('login')} className="text-sm font-medium text-primary-600 hover:text-primary-800">
                     Back to Login
                   </button>
                 </div>
               </form>
             )}
-          </div>
-          <div className="hidden md:block bg-gradient-to-br from-purple-500 to-primary-600 text-white p-8">
-            <div className="h-full flex items-center justify-center">
-              <div className="w-full max-w-sm">
-                <div className="rounded-xl bg-white/10 p-6">
-                  <div className="mx-auto w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-4">
-                    <svg className="w-12 h-12" fill="none" stroke="white" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6M9 16h6M12 8h.01M4 6h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
-                    </svg>
-                  </div>
-                  <p className="text-center text-sm">Secure login for SAGROWINFOTECH users</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
