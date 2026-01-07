@@ -2,7 +2,7 @@ import RoleCategory from '@/components/RoleCategory'
 
 export const metadata = {
   title: 'Services',
-  description: 'Explore our comprehensive training programs across multiple technology domains.',
+  description: 'Explore our comprehensive placement programs across multiple technology domains.',
 }
 
 export default function Services() {
@@ -39,7 +39,7 @@ export default function Services() {
     },
     {
       title: 'Cloud & DevOps Roles',
-      description: 'Learn cloud infrastructure and deployment strategies',
+      description: 'Architect cloud infrastructure and deployment strategies',
       roles: [
         { name: 'Cloud Engineer', duration: '6 months', level: 'Intermediate' },
         { name: 'DevOps Engineer', duration: '6 months', level: 'Intermediate' },
@@ -75,7 +75,7 @@ export default function Services() {
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">Services</h1>
-          <p className="text-lg sm:text-xl text-primary-600 font-semibold">Expert Training Programs for Every Career Path</p>
+          <p className="text-lg sm:text-xl text-primary-600 font-semibold">Expert Placement Programs for Every Career Path</p>
           <p className="text-gray-600 mt-2">Comprehensive programs across diverse technology domains</p>
         </div>
 
@@ -120,7 +120,7 @@ export default function Services() {
         {/* Additional Services */}
         <section className="bg-gradient-to-r from-primary-50 via-blue-50 to-primary-50 rounded-2xl p-8 sm:p-10 md:p-12 border-2 border-primary-200">
           <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Additional Support Services</h2>
-          <p className="text-center text-gray-600 mb-10">We offer comprehensive support beyond training</p>
+          <p className="text-center text-gray-600 mb-10">We offer comprehensive support beyond placement assistance</p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
@@ -129,7 +129,7 @@ export default function Services() {
               { icon: '🖼️', title: 'Portfolio Building', desc: 'Help creating impressive portfolios and GitHub profiles to showcase your projects.' },
               { icon: '📄', title: 'Resume Optimization', desc: 'Professional resume reviews and optimization to catch recruiter\'s attention.' },
               { icon: '🤝', title: 'Networking Events', desc: 'Regular meetups and networking sessions with industry professionals and alumni.' },
-              { icon: '⭐', title: 'Lifetime Support', desc: 'Ongoing support and access to resources even after course completion.' }
+              { icon: '⭐', title: 'Lifetime Support', desc: 'Ongoing support and access to resources even after placement completion.' }
             ].map((service, idx) => (
               <div key={idx} className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow border-l-4 border-primary-600">
                 <div className="text-3xl mb-3">{service.icon}</div>

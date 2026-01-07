@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white text-xl font-bold mb-4">SagrowInfoTech</h3>
             <p className="text-sm leading-relaxed">
-              Empowering careers through comprehensive training and placement services. 
+              Empowering careers through comprehensive placement services. 
               We bridge the gap between education and industry, helping professionals 
               achieve their career goals.
             </p>
@@ -58,7 +58,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="#services" className="hover:text-white transition-colors">
-                  Training Programs
+                  Placement Programs
                 </Link>
               </li>
               <li>

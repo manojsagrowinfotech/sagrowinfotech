@@ -19,7 +19,7 @@ export default function About() {
             <div className="mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 text-primary-600">Our Mission</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                At SagrowInfotech, we are committed to bridging the gap between education and industry. Our mission is to empower professionals by providing comprehensive training programs that equip them with in-demand skills needed in today's competitive job market.
+                At SagrowInfotech, we are committed to bridging the gap between education and industry. Our mission is to empower professionals by providing comprehensive placement programs that equip them with in-demand skills needed in today's competitive job market.
               </p>
               <p className="text-gray-700 leading-relaxed">
                 We believe that quality education combined with practical industry experience leads to successful careers. That's why we've designed our programs to include hands-on projects, real-world scenarios, and personalized placement assistance.
@@ -29,7 +29,7 @@ export default function About() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 text-primary-600">Our Vision</h2>
               <p className="text-gray-700 leading-relaxed">
-                To become the leading training and placement organization that transforms lives by enabling professionals to achieve their career aspirations through quality education, industry mentorship, and unwavering support.
+                To become the leading placement and technical consulting organization that transforms lives by enabling professionals to achieve their career aspirations through quality education, industry mentorship, and unwavering support.
               </p>
             </div>
           </div>
@@ -40,7 +40,7 @@ export default function About() {
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center text-primary-600">Our Core Values</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: '⭐', title: 'Excellence', desc: 'We strive for excellence in every aspect of our training and placement services.' },
+              { icon: '⭐', title: 'Excellence', desc: 'We strive for excellence in every aspect of our placement services.' },
               { icon: '🤝', title: 'Integrity', desc: 'We maintain the highest standards of honesty and ethical conduct.' },
               { icon: '💡', title: 'Innovation', desc: 'We continuously update our curriculum to reflect the latest industry trends.' },
               { icon: '👥', title: 'Student-Centric', desc: 'We provide personalized attention and guidance to each student.' }
@@ -59,8 +59,8 @@ export default function About() {
           <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Why Choose SagroInfotech?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              'Industry-experienced trainers with 10+ years of expertise',
-              'Comprehensive curriculum aligned with current market demands',
+              'Industry-experienced mentors with 10+ years of expertise',
+              'Comprehensive technical roadmap aligned with current market demands',
               'Hands-on projects and real-world problem-solving',
               '100% placement assistance and career guidance',
               'Flexible learning schedules to fit your lifestyle',
