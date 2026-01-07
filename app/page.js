@@ -6,20 +6,11 @@ import ReviewCard from '@/components/ReviewCard'
 import RoleCategory from '@/components/RoleCategory'
 import Services from '@/components/Services'
 import ContactModal from '@/components/ContactModal'
-import MaintenancePage from '@/components/MaintenancePage'
-import { maintenanceConfig } from '@/config/maintenance'
 import { useContactModal } from '@/components/ContactModalContext'
-
-// Check if maintenance mode is enabled (via config or environment variable)
-const MAINTENANCE_MODE = maintenanceConfig.enabled || process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
 
 function HomeContent() {
   const { openModal } = useContactModal()
   
-  // Show maintenance page if maintenance mode is enabled
-  if (MAINTENANCE_MODE) {
-    return <MaintenancePage />
-  }
   const roleCategories = [
     {
       title: 'Technical Development Roles',
@@ -58,15 +49,15 @@ function HomeContent() {
   const freshersReviews = [
     {
       name: 'Priya Sharma',
-      testimonial: 'The training program was comprehensive and the placement support was exceptional. I landed my dream job as a Java Developer within 3 months of completing the course.'
+      testimonial: 'The placement program was comprehensive and the support was exceptional. I landed my dream job as a Java Developer within 3 months of joining.'
     },
     {
       name: 'Rahul Kumar',
-      testimonial: 'Coming from a non-technical background, I was nervous about switching careers. The structured training and personalized guidance helped me secure a position as a Frontend Developer.'
+      testimonial: 'Coming from a non-technical background, I was nervous about switching careers. The structured technical guidance and personalized mentorship helped me secure a position as a Frontend Developer.'
     },
     {
       name: 'Anjali Patel',
-      testimonial: 'The interview preparation sessions were incredibly helpful. The trainers provided real-world insights that gave me confidence during client interviews. Highly recommended!'
+      testimonial: 'The interview preparation sessions were incredibly helpful. The mentors provided real-world insights that gave me confidence during client interviews. Highly recommended!'
     },
     {
       name: 'Vikram Singh',
@@ -77,15 +68,15 @@ function HomeContent() {
   const experiencedReviews = [
     {
       name: 'Rajesh Mehta',
-      testimonial: 'After 5 years in a different domain, I wanted to transition to Cloud Engineering. The advanced training and placement assistance helped me make a successful career switch.'
+      testimonial: 'After 5 years in a different domain, I wanted to transition to Cloud Engineering. The advanced technical sessions and placement assistance helped me make a successful career switch.'
     },
     {
       name: 'Sneha Reddy',
-      testimonial: 'The DevOps training program exceeded my expectations. The hands-on projects and industry-relevant curriculum prepared me well for senior-level positions.'
+      testimonial: 'The DevOps placement program exceeded my expectations. The hands-on projects and industry-relevant curriculum prepared me well for senior-level positions.'
     },
     {
       name: 'Amit Verma',
-      testimonial: 'As an experienced professional, I needed targeted training to upskill. The program was flexible and the placement team understood my career goals perfectly.'
+      testimonial: 'As an experienced professional, I needed targeted technical upskilling. The program was flexible and the placement team understood my career goals perfectly.'
     },
     {
       name: 'Deepika Nair',
@@ -95,20 +86,20 @@ function HomeContent() {
 
   const faqs = [
     {
-      question: 'What are the payment terms for the training program?',
+      question: 'What are the payment terms for the placement program?',
       answer: 'We offer flexible payment options to suit your needs. You can choose from upfront payment with discounts, installment plans, or pay-after-placement options. Our team will work with you to find the best payment structure that fits your financial situation.'
     },
     {
       question: 'Are there any hidden fees?',
-      answer: 'No, we maintain complete transparency in our pricing. All fees are clearly communicated upfront, and there are no hidden charges. The quoted price includes training, study materials, certification support, and placement assistance.'
+      answer: 'No, we maintain complete transparency in our pricing. All fees are clearly communicated upfront, and there are no hidden charges. The quoted price includes technical sessions, technical resources, certification support, and placement assistance.'
     },
     {
-      question: 'What training programs are currently available?',
-      answer: 'We offer a wide range of training programs including Java Backend Development, Full Stack Development, Cloud & DevOps, Data Science, AI/ML, and many more. New programs are added regularly based on industry demand. Please contact us for the most current list of available training programs.'
+      question: 'What placement programs are currently available?',
+      answer: 'We offer a wide range of placement programs including Java Backend Development, Full Stack Development, Cloud & DevOps, Data Science, AI/ML, and many more. New programs are added regularly based on industry demand. Please contact us for the most current list of available placement programs.'
     },
     {
       question: 'How long does the placement process take?',
-      answer: 'The placement duration varies based on individual performance and market conditions. Typically, our candidates receive placement opportunities within 3-6 months after completing the training program. We provide continuous support until you secure a suitable position.'
+      answer: 'The placement duration varies based on individual performance and market conditions. Typically, our candidates receive placement opportunities within 3-6 months after completing the program. We provide continuous support until you secure a suitable position.'
     },
     {
       question: 'What experience levels are eligible for your programs?',
@@ -123,7 +114,7 @@ function HomeContent() {
       answer: 'Salary expectations vary based on your experience level, the role, location, and company. Freshers typically receive competitive entry-level packages, while experienced professionals can expect significant salary improvements. We provide market insights and salary negotiation guidance to help you secure the best compensation.'
     },
     {
-      question: 'What roles and technologies are covered in your training programs?',
+      question: 'What roles and technologies are covered in your placement programs?',
       answer: 'We cover a comprehensive range of roles including Java Development, Full Stack Development, Cloud Engineering, DevOps, Data Science, AI/ML, QA Automation, UI/UX Design, Mobile Development, and many more. Our curriculum is regularly updated to include the latest technologies and industry best practices.'
     }
   ]
@@ -155,10 +146,10 @@ function HomeContent() {
             <div className="max-w-2xl">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
                 Accelerate Your Career Growth with
-                <span className="text-primary-600"> Professional Training</span>
+                <span className="text-primary-600"> Professional Placements</span>
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-6 sm:mb-8 leading-relaxed">
-                Transform your career with our comprehensive training programs and expert placement assistance. 
+                Transform your career with our comprehensive placement programs and expert technical guidance. 
                 We provide the skills, knowledge, and support you need to succeed in today's competitive job market.
               </p>
               <Link href="/about" className="btn-primary inline-block">
@@ -186,7 +177,7 @@ function HomeContent() {
               About Us
             </h2>
             <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8">
-              SagrowInfotech is a leading training and placement organization dedicated to empowering 
+              SagrowInfotech is a leading placement and technical consulting organization dedicated to empowering 
               professionals and freshers with industry-relevant skills and career opportunities. We 
               understand the challenges of transitioning from education to industry, and we're here 
               to bridge that gap with comprehensive support at every step of your journey.
@@ -216,7 +207,7 @@ function HomeContent() {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Training & Placement Details</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Placement & Technical Details</h3>
                 <ul className="space-y-2 sm:space-y-3 text-gray-700 text-sm sm:text-base">
                   <li className="flex items-start gap-2">
                     <span className="w-2 h-2 bg-primary-600 rounded-full mt-1.5 flex-shrink-0"></span>
@@ -224,7 +215,7 @@ function HomeContent() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-2 h-2 bg-primary-600 rounded-full mt-1.5 flex-shrink-0"></span>
-                    <span>Currently offering Java Backend Development training</span>
+                    <span>Currently offering Java Backend Development placement support</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-2 h-2 bg-primary-600 rounded-full mt-1.5 flex-shrink-0"></span>
@@ -232,7 +223,7 @@ function HomeContent() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-2 h-2 bg-primary-600 rounded-full mt-1.5 flex-shrink-0"></span>
-                    <span>Flexible training schedules to accommodate working professionals</span>
+                    <span>Flexible technical schedules to accommodate working professionals</span>
                   </li>
                 </ul>
               </div>
@@ -255,8 +246,8 @@ function HomeContent() {
             </h2>
             <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 px-2">
               The gap between academic learning and industry requirements can be challenging to bridge. 
-              Our skill-based training programs are specifically designed to equip you with practical, 
-              job-ready skills that employers value. We don't just train you; we support you throughout 
+              Our skill-based placement programs are specifically designed to equip you with practical, 
+              job-ready skills that employers value. We don't just guide you; we support you throughout 
               your placement journey, ensuring you're well-prepared for interviews and confident in your abilities.
             </p>
             <p className="text-base sm:text-lg text-gray-700 leading-relaxed px-2">
@@ -330,7 +321,7 @@ function HomeContent() {
                 Frequently Asked Questions
               </h2>
               <p className="text-base sm:text-lg text-gray-700 px-2">
-                Find answers to common questions about our training and placement services
+                Find answers to common questions about our placement and technical services
               </p>
             </div>
             <div>
@@ -351,7 +342,7 @@ function HomeContent() {
             </h2>
             <p className="text-base sm:text-lg md:text-xl mb-4 sm:mb-6 text-primary-100 leading-relaxed px-2">
               We are committed to your success. Our proven track record, industry expertise, and 
-              personalized approach ensure that you receive the best training and placement support. 
+              personalized approach ensure that you receive the best placement and technical support. 
               We build confidence in our candidates through comprehensive preparation, real-world 
               projects, and continuous mentorship.
             </p>
