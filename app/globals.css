@@ -41,3 +41,47 @@
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+@keyframes aiFloat {
+  0%   { transform: translate(0px, 0px); }
+  25%  { transform: translate(14px, -12px); }
+  50%  { transform: translate(0px, -22px); }
+  75%  { transform: translate(-14px, -12px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+.ai-float {
+  animation: aiFloat 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  gap: 2.5rem;
+  animation: marqueeScroll 28s linear infinite;
+  will-change: transform;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+@keyframes slow-zoom {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1); }
+  100% { transform: scale(0.95); }
+}
+
+.hero-image {
+  animation: slow-zoom 20s ease-in-out infinite;
+}
+
+.animate-marquee {
+  animation: marquee 60s linear infinite;
+}
