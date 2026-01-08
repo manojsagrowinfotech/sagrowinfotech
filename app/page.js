@@ -252,10 +252,7 @@ const placementLogos = [
 </section>
 
       {/* About Us Section */}
-<section
-  className="mt-3 md:mt-4 py-3 sm:py-4 md:py-6 bg-white px-3 sm:px-4 md:px-6 lg:px-8"
-  id="about"
->
+ <section className="py-12 sm:py-16 md:py-20 bg-white px-3 sm:px-4 md:px-6 lg:px-8" id="about">
 
         <div className="max-w-6xl mx-auto">
           <div className="max-w-4xl mx-auto">
