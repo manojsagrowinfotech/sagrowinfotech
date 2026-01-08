@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import * as XLSX from 'xlsx';
-import { studentApi, excelApi } from '@/lib/api';
-import UpdateProfileModal from '@/components/UpdateProfileModal';
-import ChangePasswordModal from '@/components/ChangePasswordModal';
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
+import { studentApi, excelApi } from "@/lib/api";
+import UpdateProfileModal from "@/components/UpdateProfileModal";
 
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
@@ -14,7 +13,6 @@ export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
   const [isUpdateProfileOpen, setIsUpdateProfileOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [filters, setFilters] = useState({
     emailId: '',
     mobileNo: '',
@@ -123,14 +121,25 @@ export default function Dashboard() {
     setFilters({ ...filters, page: p });
   };
   
+  const isAdmin = (user?.role || '').toLowerCase() === 'admin';
+  const handleDelete = async (id) => {
+    const ok = window.confirm('Are you sure you want to delete this candidate? This action cannot be undone.');
+    if (!ok) return;
+    try {
+      await studentApi.deleteStudent(id);
+      setStudents((prev) => prev.filter((s) => s.id !== id));
+      setPagination((p) => ({ ...p, totalRecords: Math.max(0, (p.totalRecords || 0) - 1) }));
+    } catch (err) {
+      console.error('Delete failed', err);
+      alert('Failed to delete candidate. Please try again.');
+    }
+  };
+  
   useEffect(() => {
     const onOpenUpdate = () => setIsUpdateProfileOpen(true);
-    const onOpenChange = () => setIsChangePasswordOpen(true);
     window.addEventListener('openUpdateProfile', onOpenUpdate);
-    window.addEventListener('openChangePassword', onOpenChange);
     return () => {
       window.removeEventListener('openUpdateProfile', onOpenUpdate);
-      window.removeEventListener('openChangePassword', onOpenChange);
     };
   }, []);
 
@@ -149,27 +158,22 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Welcome back, <span className="font-semibold text-primary-600">{user.fullName}</span></p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <button 
             className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
             onClick={() => setIsUpdateProfileOpen(true)}
           >
             Update Profile
           </button>
-           <button 
-            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
-            onClick={() => setIsChangePasswordOpen(true)}
-          >
-            Change Password
-          </button>
           <button 
             onClick={downloadExcel}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+            title="Download Excel"
+            aria-label="Download Excel"
+            className="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition-colors flex items-center"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download Excel
           </button>
         </div>
       </div>
@@ -286,7 +290,7 @@ export default function Dashboard() {
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Student Details</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Candidate Details</h2>
         </div>
         {isLoadingStudents ? (
           <div className="p-8 text-center">
@@ -298,7 +302,7 @@ export default function Dashboard() {
             <div className="md:hidden p-4 space-y-3">
               {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
                 <div key={student.id} className="border rounded-lg p-3 bg-white">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <p className="font-semibold text-gray-900">{student.name}</p>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-700">
                       {(student.experienceLevel || '').toLowerCase().startsWith('f') ? 'Fresher' : 'Experienced'}
@@ -308,10 +312,27 @@ export default function Dashboard() {
                     <p>Mobile: <span className="text-gray-900">{student.mobileNo}</span></p>
                     <p>Email: <span className="text-gray-900">{student.emailId}</span></p>
                     <p>State: <span className="text-gray-900">{student.state}</span></p>
+                    {student.preferredTechnicalDomain && (
+                      <p>Preferred Domain: <span className="text-gray-900">{student.preferredTechnicalDomain}</span></p>
+                    )}
                     {student.yearsOfExperience && (
                       <p>Years: <span className="text-gray-900">{student.yearsOfExperience}</span></p>
                     )}
                   </div>
+                  {isAdmin && (
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        onClick={() => handleDelete(student.id)}
+                        title="Delete"
+                        aria-label="Delete"
+                        className="p-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -324,6 +345,10 @@ export default function Dashboard() {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email ID</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preferred Domain</th>
+                    {isAdmin && (
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -338,6 +363,23 @@ export default function Dashboard() {
                           ? 'Fresher'
                           : `Experienced${student.yearsOfExperience ? ` (${student.yearsOfExperience})` : ''}`}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.preferredTechnicalDomain || '-'}
+                      </td>
+                      {isAdmin && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button
+                            onClick={() => handleDelete(student.id)}
+                            title="Delete"
+                            aria-label="Delete"
+                            className="p-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -369,7 +411,6 @@ export default function Dashboard() {
       </div>
 
       <UpdateProfileModal isOpen={isUpdateProfileOpen} onClose={() => setIsUpdateProfileOpen(false)} />
-      <ChangePasswordModal isOpen={isChangePasswordOpen} onClose={() => setIsChangePasswordOpen(false)} />
     </div>
     );
   }
