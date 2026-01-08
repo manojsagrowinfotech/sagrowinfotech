@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.sagrowinfotech.com
+
+# Sitemaps
+Sitemap: https://www.sagrowinfotech.com/sitemap.xml
