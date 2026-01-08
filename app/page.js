@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import FAQAccordion from '@/components/FAQAccordion'
 import ReviewCard from '@/components/ReviewCard'
 import RoleCategory from '@/components/RoleCategory'
@@ -10,6 +11,7 @@ import { useContactModal } from '@/components/ContactModalContext'
 
 function HomeContent() {
   const { openModal } = useContactModal()
+  const [heroImageError, setHeroImageError] = useState(false)
   
   const roleCategories = [
     {
@@ -136,45 +138,125 @@ function HomeContent() {
     'East India': ['Kolkata', 'Bhubaneswar', 'Patna', 'Ranchi', 'Guwahati'],
     'West India': ['Mumbai', 'Pune', 'Ahmedabad', 'Surat', 'Nagpur', 'Indore']
   }
+  
+const placementLogos = [
+  { name: "TCS", src: "/images/logos/tcs.svg" },
+  { name: "Infosys", src: "/images/logos/infosys.svg" },
+  { name: "Wipro", src: "/images/logos/wipro.svg" },
+  { name: "Tech Mahindra", src: "/images/logos/tech-mahindra.svg" },
+  { name: "Accenture", src: "/images/logos/accenture.svg" },
+  { name: "Amazon", src: "/images/logos/amazon.svg" },
+  { name: "Flipkart", src: "/images/logos/flipkart.svg" },
+];
 
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-50 to-primary-100 py-12 sm:py-16 md:py-20 px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-                Accelerate Your Career Growth with
-                <span className="text-primary-600"> Professional Placements</span>
-              </h1>
-              <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-6 sm:mb-8 leading-relaxed">
-                Transform your career with our comprehensive placement programs and expert technical guidance. 
-                We provide the skills, knowledge, and support you need to succeed in today's competitive job market.
-              </p>
+<section className="relative min-h-[90vh] md:min-h-[100vh] flex flex-col justify-center px-4 sm:px-6 lg:px-12 overflow-hidden">
+  
+  {/* Background Image */}
+  <div className="absolute inset-0">
+    <img
+      src="/images/ai-placement-ecosystem.png"
+      alt="AI Placement Ecosystem"
+      className="w-full h-full object-cover object-center"
+    />
+    <div className="absolute inset-0 bg-gradient-to-r from-primary-900/80 via-primary-800/70 to-primary-700/60" />
+  </div>
 
-  <button
-    onClick={openModal}
-    className="bg-primary-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors duration-200 inline-block text-sm sm:text-base"
-  >
-    Get Started
-  </button>
-            </div>
-            <div className="hidden lg:flex justify-center items-center">
-              <div className="w-full h-96 relative rounded-2xl shadow-2xl overflow-hidden bg-white">
-                <img
-                  src="/images/it-services-illustration.svg"
-                  alt="IT Services - Software Development, Cloud Computing, AI, and Cybersecurity"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
+  {/* Content */}
+  <div className="relative z-10 max-w-7xl mx-auto w-full">
+    <div className="max-w-2xl text-center md:text-left">
+
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
+        Accelerate Your Career Growth with
+        <span className="block text-primary-200">
+          Precision Talent Placements
+        </span>
+      </h1>
+
+      <p className="text-base sm:text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
+        Our placement infrastructure integrates technical skill verification,
+        domain intelligence, and enterprise hiring pipelines to deliver scalable,
+        high-confidence talent placements.
+      </p>
+
+      {/* CTA */}
+      <div className="flex justify-center md:justify-start">
+        <button
+          onClick={openModal}
+          className="bg-primary-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary-700 shadow-lg transition-all duration-200"
+        >
+          Get Started
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section className="bg-white py-2 sm:py-3 overflow-hidden w-full">
+  <div className="relative w-full overflow-hidden">
+
+    <div className="flex w-max animate-marquee items-center">
+      {[...placementLogos, ...placementLogos].map((item, idx) => (
+        <div
+          key={idx}
+          className="flex items-center justify-center px-3 sm:px-5"
+        >
+          <img
+            src={item.src}
+            alt={item.name}
+            className="
+              h-5           /* Mobile */
+              sm:h-6        /* Small tablets */
+              md:h-7      /* Desktop */
+              lg:h-8      /* Large screens */
+              w-auto
+              opacity-85
+              hover:opacity-100
+              transition-opacity duration-300
+            "
+            loading="lazy"
+            onError={(e) =>
+              (e.currentTarget.src = "/images/logo-full.svg")
+            }
+          />
         </div>
-      </section>
+      ))}
+    </div>
+
+  </div>
+
+  <style jsx>{`
+    @keyframes marquee {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .animate-marquee {
+      animation: marquee 45s linear infinite;
+      will-change: transform;
+    }
+
+    @media (max-width: 640px) {
+      .animate-marquee {
+        animation-duration: 65s;
+      }
+    }
+  `}</style>
+</section>
 
       {/* About Us Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white px-3 sm:px-4 md:px-6 lg:px-8" id="about">
+<section
+  className="mt-3 md:mt-4 py-3 sm:py-4 md:py-6 bg-white px-3 sm:px-4 md:px-6 lg:px-8"
+  id="about"
+>
+
         <div className="max-w-6xl mx-auto">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center leading-tight">
