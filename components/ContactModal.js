@@ -32,6 +32,8 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
   const [mobileError, setMobileError] = useState('')
   const [stateError, setStateError] = useState('')
   const [yearsError, setYearsError] = useState('')
+  const [preferredTechnicalDomain, setPreferredTechnicalDomain] = useState('')
+  const [preferredTechnicalDomainError, setPreferredTechnicalDomainError] = useState('')
 
   useEffect(() => {
     async function loadOptions() {
@@ -70,6 +72,8 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
     setMobileError('')
     setStateError('')
     setYearsError('')
+    setPreferredTechnicalDomain('')
+    setPreferredTechnicalDomainError('')
   }
 
   function validate() {
@@ -78,12 +82,15 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
     setMobileError('')
     setStateError('')
     setYearsError('')
+    setPreferredTechnicalDomainError('')
     let hasError = false
     if (!name.trim()) { setNameError('Please enter your name'); hasError = true }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Please enter a valid email Id'); hasError = true }
     if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile)) { setMobileError('Please enter a valid mobile number'); hasError = true }
     if (!state) { setStateError('Please select your state'); hasError = true }
     if (experience === 'EXPERIENCED' && !years) { setYearsError('Please select years of experience'); hasError = true }
+    const domain = preferredTechnicalDomain.trim()
+    if (!domain || !/^[A-Za-z\s]{1,100}$/.test(domain)) { setPreferredTechnicalDomainError('Alphabetic characters and spaces only. Max length: 100'); hasError = true }
     return !hasError
   }
 
@@ -101,6 +108,7 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
         emailId: email,
         experienceLevel: experience,
         state,
+        preferredTechnicalDomain: preferredTechnicalDomain.trim(),
       }
       if (experience === 'EXPERIENCED') {
         payload.yearsOfExperience = years
@@ -197,6 +205,17 @@ export default function ContactModal({ isOpen: controlledOpen, onClose, showButt
                     className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${mobileError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
                   />
                   {mobileError && <p className="mt-1 text-xs text-red-600">{mobileError}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-primary-900 text-sm font-semibold mb-1.5">Preferred Technical Domain</label>
+                  <input
+                    value={preferredTechnicalDomain}
+                    onChange={(e) => { setPreferredTechnicalDomain(e.target.value); if (preferredTechnicalDomainError) setPreferredTechnicalDomainError('') }}
+                    maxLength={100}
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${preferredTechnicalDomainError ? 'focus:ring-2 border-red-400 focus:ring-red-500' : 'focus:ring-2 focus:ring-primary-500'}`}
+                  />
+                    {preferredTechnicalDomainError && <p className="mt-1 text-xs text-red-600">{preferredTechnicalDomainError}</p>}
                 </div>
 
                 <div>
