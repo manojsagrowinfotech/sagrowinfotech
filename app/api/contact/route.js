@@ -1,28 +1,43 @@
-import nodemailer from 'nodemailer'
-import { NextResponse } from 'next/server'
+import nodemailer from "nodemailer";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const data = await req.json()
-    const { name, email, mobile, experience, years } = data || {}
+    const data = await req.json();
+    const { name, email, mobile, experience, years } = data || {};
 
     if (!name || !email || !mobile) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // Read SMTP config from environment variables
-    const SMTP_HOST = process.env.SMTP_HOST
-    const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined
-    const SMTP_USER = process.env.SMTP_USER
-    const SMTP_PASS = process.env.SMTP_PASS
-    const RECEIVER = process.env.CONTACT_RECEIVER || SMTP_USER
+    const SMTP_HOST = process.env.SMTP_HOST;
+    const SMTP_PORT = process.env.SMTP_PORT
+      ? Number(process.env.SMTP_PORT)
+      : undefined;
+    const SMTP_USER = process.env.SMTP_USER;
+    const SMTP_PASS = process.env.SMTP_PASS;
+    const RECEIVER = process.env.CONTACT_RECEIVER || SMTP_USER;
 
     if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
       // If SMTP not configured, return helpful message
-      console.error('SMTP not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS environment variables.')
+      console.error(
+        "SMTP not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS environment variables."
+      );
       // Fallback: write to logs and return success (so form doesn't break), but indicate email not sent
-      console.log('Contact form received:', { name, email, mobile, experience })
-      return NextResponse.json({ message: 'Received (email not sent - SMTP not configured).' }, { status: 200 })
+      console.log("Contact form received:", {
+        name,
+        email,
+        mobile,
+        experience,
+      });
+      return NextResponse.json(
+        { message: "Received (email not sent - SMTP not configured)." },
+        { status: 200 }
+      );
     }
 
     const transporter = nodemailer.createTransport({
@@ -33,9 +48,9 @@ export async function POST(req) {
         user: SMTP_USER,
         pass: SMTP_PASS,
       },
-    })
+    });
 
-    const subject = `New student contact: ${name} (${experience})`
+    const subject = `New student contact: ${name} (${experience})`;
     const html = `
       <h3>New Student Contact</h3>
       <ul>
@@ -43,20 +58,20 @@ export async function POST(req) {
         <li><strong>Email:</strong> ${email}</li>
         <li><strong>Mobile:</strong> ${mobile}</li>
         <li><strong>Experience:</strong> ${experience}</li>
-        ${years ? `<li><strong>Years:</strong> ${years}</li>` : ''}
+        ${years ? `<li><strong>Years:</strong> ${years}</li>` : ""}
       </ul>
-    `
+    `;
 
     await transporter.sendMail({
       from: SMTP_USER,
       to: RECEIVER,
       subject,
       html,
-    })
+    });
 
-    return NextResponse.json({ message: 'Email sent' }, { status: 200 })
+    return NextResponse.json({ message: "Email sent" }, { status: 200 });
   } catch (err) {
-    console.error('Contact API error', err)
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    console.error("Contact API error", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

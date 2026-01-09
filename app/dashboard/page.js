@@ -14,21 +14,26 @@ export default function Dashboard() {
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
   const [isUpdateProfileOpen, setIsUpdateProfileOpen] = useState(false);
   const [filters, setFilters] = useState({
-    emailId: '',
-    mobileNo: '',
-    fromDate: '',
-    toDate: '',
-    sortBy: 'createdTime',
-    order: 'ASC',
+    emailId: "",
+    mobileNo: "",
+    fromDate: "",
+    toDate: "",
+    sortBy: "createdTime",
+    order: "ASC",
     page: 1,
     limit: 10,
   });
-  const [pagination, setPagination] = useState({ totalRecords: 0, currentPage: 1, totalPages: 1, limit: 10 });
-  const [stateFilter, setStateFilter] = useState('');
+  const [pagination, setPagination] = useState({
+    totalRecords: 0,
+    currentPage: 1,
+    totalPages: 1,
+    limit: 10,
+  });
+  const [stateFilter, setStateFilter] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/');
+      router.push("/");
     }
   }, [user, loading, router]);
 
@@ -46,13 +51,26 @@ export default function Dashboard() {
           order: filters.order,
         };
         const response = await studentApi.getStudents(params);
-        const { records = [], pagination: p = { totalRecords: 0, currentPage: 1, totalPages: 1, limit: filters.limit } } = response.data || {};
+        const {
+          records = [],
+          pagination: p = {
+            totalRecords: 0,
+            currentPage: 1,
+            totalPages: 1,
+            limit: filters.limit,
+          },
+        } = response.data || {};
         setStudents(records);
         setPagination(p);
       } catch (error) {
-        console.error('Failed to fetch students', error);
+        console.error("Failed to fetch students", error);
         setStudents([]);
-        setPagination({ totalRecords: 0, currentPage: 1, totalPages: 1, limit: filters.limit });
+        setPagination({
+          totalRecords: 0,
+          currentPage: 1,
+          totalPages: 1,
+          limit: filters.limit,
+        });
       } finally {
         setIsLoadingStudents(false);
       }
@@ -65,14 +83,19 @@ export default function Dashboard() {
 
   const downloadExcel = async () => {
     if (!filters.fromDate || !filters.toDate) {
-      alert('Please select From date and To date');
+      alert("Please select From date and To date");
       return;
     }
     try {
-      const res = await excelApi.download({ fromDate: filters.fromDate, toDate: filters.toDate });
-      const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const res = await excelApi.download({
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
+      });
+      const blob = new Blob([res.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `students_${filters.fromDate}_${filters.toDate}.xlsx`;
       document.body.appendChild(a);
@@ -80,66 +103,75 @@ export default function Dashboard() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Excel download failed', err);
-      alert('Excel download failed. Please ensure you are logged in.');
+      console.error("Excel download failed", err);
+      alert("Excel download failed. Please ensure you are logged in.");
     }
   };
-  
+
   const totalStudents = pagination.totalRecords || students.length;
-  const fresherCount = students.filter(s => (s.experienceLevel || '').toLowerCase().startsWith('f')).length;
-  const experiencedCount = students.filter(s => (s.experienceLevel || '').toLowerCase().startsWith('e')).length;
+  const fresherCount = students.filter((s) =>
+    (s.experienceLevel || "").toLowerCase().startsWith("f")
+  ).length;
+  const experiencedCount = students.filter((s) =>
+    (s.experienceLevel || "").toLowerCase().startsWith("e")
+  ).length;
   const stateCounts = students.reduce((acc, s) => {
     const st = s.state;
     acc[st] = (acc[st] || 0) + 1;
     return acc;
   }, {});
-  
+
   const applyFilters = () => {
     setIsLoadingStudents(true);
     setFilters({ ...filters, page: 1 });
-    setStateFilter('');
+    setStateFilter("");
   };
-  
+
   const resetFilters = () => {
     setIsLoadingStudents(true);
     setFilters({
-      emailId: '',
-      mobileNo: '',
-      fromDate: '',
-      toDate: '',
-      sortBy: 'createdTime',
-      order: 'ASC',
+      emailId: "",
+      mobileNo: "",
+      fromDate: "",
+      toDate: "",
+      sortBy: "createdTime",
+      order: "ASC",
       page: 1,
       limit: 10,
     });
-    setStateFilter('');
+    setStateFilter("");
   };
-  
+
   const goToPage = (p) => {
     if (p < 1 || p > (pagination.totalPages || 1)) return;
     setIsLoadingStudents(true);
     setFilters({ ...filters, page: p });
   };
-  
-  const isAdmin = (user?.role || '').toLowerCase() === 'admin';
+
+  const isAdmin = (user?.role || "").toLowerCase() === "admin";
   const handleDelete = async (id) => {
-    const ok = window.confirm('Are you sure you want to delete this candidate? This action cannot be undone.');
+    const ok = window.confirm(
+      "Are you sure you want to delete this candidate? This action cannot be undone."
+    );
     if (!ok) return;
     try {
       await studentApi.deleteStudent(id);
       setStudents((prev) => prev.filter((s) => s.id !== id));
-      setPagination((p) => ({ ...p, totalRecords: Math.max(0, (p.totalRecords || 0) - 1) }));
+      setPagination((p) => ({
+        ...p,
+        totalRecords: Math.max(0, (p.totalRecords || 0) - 1),
+      }));
     } catch (err) {
-      console.error('Delete failed', err);
-      alert('Failed to delete candidate. Please try again.');
+      console.error("Delete failed", err);
+      alert("Failed to delete candidate. Please try again.");
     }
   };
-  
+
   useEffect(() => {
     const onOpenUpdate = () => setIsUpdateProfileOpen(true);
-    window.addEventListener('openUpdateProfile', onOpenUpdate);
+    window.addEventListener("openUpdateProfile", onOpenUpdate);
     return () => {
-      window.removeEventListener('openUpdateProfile', onOpenUpdate);
+      window.removeEventListener("openUpdateProfile", onOpenUpdate);
     };
   }, []);
 
@@ -156,23 +188,38 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, <span className="font-semibold text-primary-600">{user.fullName}</span></p>
+          <p className="text-gray-600">
+            Welcome back,{" "}
+            <span className="font-semibold text-primary-600">
+              {user.fullName}
+            </span>
+          </p>
         </div>
         <div className="flex gap-3 items-center">
-          <button 
+          <button
             className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
             onClick={() => setIsUpdateProfileOpen(true)}
           >
             Update Profile
           </button>
-          <button 
+          <button
             onClick={downloadExcel}
             title="Download Excel"
             aria-label="Download Excel"
             className="bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition-colors flex items-center"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
             </svg>
           </button>
         </div>
@@ -182,7 +229,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-md shadow p-4">
           <p className="text-sm text-gray-500">Total Students</p>
-          <p className="text-2xl font-semibold text-gray-900">{totalStudents}</p>
+          <p className="text-2xl font-semibold text-gray-900">
+            {totalStudents}
+          </p>
         </div>
         <div className="bg-white rounded-md shadow p-4">
           <p className="text-sm text-gray-500">Fresher</p>
@@ -190,7 +239,9 @@ export default function Dashboard() {
         </div>
         <div className="bg-white rounded-md shadow p-4">
           <p className="text-sm text-gray-500">Experienced</p>
-          <p className="text-2xl font-semibold text-gray-900">{experiencedCount}</p>
+          <p className="text-2xl font-semibold text-gray-900">
+            {experiencedCount}
+          </p>
         </div>
         <div className="bg-white rounded-md shadow p-4">
           <p className="text-sm text-gray-500">States</p>
@@ -215,27 +266,37 @@ export default function Dashboard() {
             <input
               type="email"
               value={filters.emailId}
-              onChange={(e) => setFilters({ ...filters, emailId: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, emailId: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="example@email.com"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Mobile number</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Mobile number
+            </label>
             <input
               type="text"
               value={filters.mobileNo}
-              onChange={(e) => setFilters({ ...filters, mobileNo: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, mobileNo: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="9876543210"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">From date</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              From date
+            </label>
             <input
               type="date"
               value={filters.fromDate}
-              onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, fromDate: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -244,7 +305,9 @@ export default function Dashboard() {
             <input
               type="date"
               value={filters.toDate}
-              onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, toDate: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -290,7 +353,9 @@ export default function Dashboard() {
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Candidate Details</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Candidate Details
+          </h2>
         </div>
         {isLoadingStudents ? (
           <div className="p-8 text-center">
@@ -300,23 +365,54 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="md:hidden p-4 space-y-3">
-              {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
-                <div key={student.id} className="border rounded-lg p-3 bg-white">
+              {(stateFilter
+                ? students.filter((s) => s.state === stateFilter)
+                : students
+              ).map((student) => (
+                <div
+                  key={student.id}
+                  className="border rounded-lg p-3 bg-white"
+                >
                   <div className="flex justify-between items-center">
-                    <p className="font-semibold text-gray-900">{student.name}</p>
+                    <p className="font-semibold text-gray-900">
+                      {student.name}
+                    </p>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-700">
-                      {(student.experienceLevel || '').toLowerCase().startsWith('f') ? 'Fresher' : 'Experienced'}
+                      {(student.experienceLevel || "")
+                        .toLowerCase()
+                        .startsWith("f")
+                        ? "Fresher"
+                        : "Experienced"}
                     </span>
                   </div>
                   <div className="mt-2 text-sm text-gray-700">
-                    <p>Mobile: <span className="text-gray-900">{student.mobileNo}</span></p>
-                    <p>Email: <span className="text-gray-900">{student.emailId}</span></p>
-                    <p>State: <span className="text-gray-900">{student.state}</span></p>
+                    <p>
+                      Mobile:{" "}
+                      <span className="text-gray-900">{student.mobileNo}</span>
+                    </p>
+                    <p>
+                      Email:{" "}
+                      <span className="text-gray-900">{student.emailId}</span>
+                    </p>
+                    <p>
+                      State:{" "}
+                      <span className="text-gray-900">{student.state}</span>
+                    </p>
                     {student.preferredTechnicalDomain && (
-                      <p>Preferred Domain: <span className="text-gray-900">{student.preferredTechnicalDomain}</span></p>
+                      <p>
+                        Preferred Domain:{" "}
+                        <span className="text-gray-900">
+                          {student.preferredTechnicalDomain}
+                        </span>
+                      </p>
                     )}
                     {student.yearsOfExperience && (
-                      <p>Years: <span className="text-gray-900">{student.yearsOfExperience}</span></p>
+                      <p>
+                        Years:{" "}
+                        <span className="text-gray-900">
+                          {student.yearsOfExperience}
+                        </span>
+                      </p>
                     )}
                   </div>
                   {isAdmin && (
@@ -327,8 +423,18 @@ export default function Dashboard() {
                         aria-label="Delete"
                         className="p-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -340,31 +446,86 @@ export default function Dashboard() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile Number</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email ID</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preferred Domain</th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Mobile Number
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Email ID
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      State
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Experience
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Preferred Domain
+                    </th>
                     {isAdmin && (
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
                     )}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {(stateFilter ? students.filter(s => s.state === stateFilter) : students).map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.mobileNo}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.emailId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.state}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {(student.experienceLevel || '').toLowerCase().startsWith('f')
-                          ? 'Fresher'
-                          : `Experienced${student.yearsOfExperience ? ` (${student.yearsOfExperience})` : ''}`}
+                  {(stateFilter
+                    ? students.filter((s) => s.state === stateFilter)
+                    : students
+                  ).map((student) => (
+                    <tr
+                      key={student.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {student.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.preferredTechnicalDomain || '-'}
+                        {student.mobileNo}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.emailId}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.state}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {(student.experienceLevel || "")
+                          .toLowerCase()
+                          .startsWith("f")
+                          ? "Fresher"
+                          : `Experienced${
+                              student.yearsOfExperience
+                                ? ` (${student.yearsOfExperience})`
+                                : ""
+                            }`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.preferredTechnicalDomain || "-"}
                       </td>
                       {isAdmin && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -374,8 +535,18 @@ export default function Dashboard() {
                             aria-label="Delete"
                             className="p-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"
+                              />
                             </svg>
                           </button>
                         </td>
@@ -388,7 +559,7 @@ export default function Dashboard() {
           </>
         )}
       </div>
-      
+
       {/* Pagination */}
       <div className="mt-6 flex items-center justify-between">
         <button
@@ -410,7 +581,10 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <UpdateProfileModal isOpen={isUpdateProfileOpen} onClose={() => setIsUpdateProfileOpen(false)} />
+      <UpdateProfileModal
+        isOpen={isUpdateProfileOpen}
+        onClose={() => setIsUpdateProfileOpen(false)}
+      />
     </div>
-    );
-  }
+  );
+}
