@@ -28,8 +28,6 @@ export default function UpdateProfileModal({ isOpen, onClose }) {
       try {
         const res = await studentApi.getStates();
         setStates(res?.data?.states || []);
-        if (!state && res?.data?.states?.length)
-          setState(res.data.states[0].key);
       } catch (e) {
         setError("Failed to fetch states");
       }

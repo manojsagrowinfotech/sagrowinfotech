@@ -12,7 +12,11 @@ export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
   const [isUpdateProfileOpen, setIsUpdateProfileOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("students"); // 'students' | 'excel'
+  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'candidates' | 'excel'
+  const [chartMonth, setChartMonth] = useState(() => new Date().getMonth() + 1);
+  const [chartYear, setChartYear] = useState(() => new Date().getFullYear());
+  const [isLoadingChart, setIsLoadingChart] = useState(true);
+  const [chartData, setChartData] = useState([]);
 
   const [filters, setFilters] = useState({
     emailId: "",
@@ -42,9 +46,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/");
+      router.push("/login");
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    setActiveTab("overview");
+  }, []);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -89,6 +97,44 @@ export default function Dashboard() {
       fetchStudents();
     }
   }, [user, filters]);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      setIsLoadingChart(true);
+      try {
+        const start = new Date(chartYear, chartMonth - 1, 1);
+        const end = new Date(chartYear, chartMonth, 0);
+        const fromDate = start.toISOString().split("T")[0];
+        const toDate = end.toISOString().split("T")[0];
+        const res = await studentApi.getStudents({
+          fromDate,
+          toDate,
+          page: 1,
+          limit: 1000,
+          sortBy: "createdTime",
+          order: "ASC",
+        });
+        const records = res?.data?.records || [];
+        const fresher = records.filter((r) =>
+          (r.experienceLevel || "").toUpperCase().startsWith("F")
+        ).length;
+        const experienced = records.filter((r) =>
+          (r.experienceLevel || "").toUpperCase().startsWith("E")
+        ).length;
+        const other = Math.max(0, records.length - fresher - experienced);
+        setChartData([
+          { label: "Fresher", value: fresher, color: "#2563eb" },
+          { label: "Experienced", value: experienced, color: "#16a34a" },
+          ...(other > 0 ? [{ label: "Other/Unknown", value: other, color: "#6b7280" }] : []),
+        ]);
+      } catch (e) {
+        setChartData([]);
+      } finally {
+        setIsLoadingChart(false);
+      }
+    };
+    if (user) fetchChartData();
+  }, [user, chartMonth, chartYear]);
 
   const downloadExcel = async () => {
     if (!filters.fromDate || !filters.toDate) {
@@ -184,14 +230,53 @@ export default function Dashboard() {
     };
   }, []);
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
       </div>
     );
   }
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Redirecting to login...</div>
+    </div>
+  );
+}
 
+function PieChart({ data, size = 240, thickness = 28 }) {
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const radius = (size - thickness) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+  return (
+    <div className="flex items-center justify-center">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <g transform={`translate(${size / 2}, ${size / 2})`}>
+          <circle r={radius} fill="none" stroke="#f3f4f6" strokeWidth={thickness} />
+          {data.map((d) => {
+            const segment = total ? (d.value / total) * circumference : 0;
+            const dasharray = `${segment} ${circumference - segment}`;
+            const circle = (
+              <circle
+                key={d.label}
+                r={radius}
+                fill="none"
+                stroke={d.color}
+                strokeWidth={thickness}
+                strokeDasharray={dasharray}
+                strokeDashoffset={-offset}
+              />
+            );
+            offset += segment;
+            return circle;
+          })}
+        </g>
+      </svg>
+    </div>
+  );
+}
   return (
     <div className="container-custom py-6 min-h-screen flex flex-col lg:flex-row gap-8 bg-gray-50/50">
       {/* Left Sidebar */}
@@ -224,6 +309,19 @@ export default function Dashboard() {
 
           {/* Navigation Menu */}
           <nav className="space-y-2">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group ${
+                activeTab === "overview" 
+                  ? "bg-indigo-50 text-indigo-700 font-semibold shadow-sm ring-1 ring-indigo-100" 
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <div className={`p-2 rounded-lg transition-colors ${activeTab === "overview" ? "bg-white text-indigo-600" : "bg-gray-100 group-hover:bg-white"}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9 9 0 1020.945 13H11V3.055z" /></svg>
+              </div>
+              <span className="font-medium">Overview</span>
+            </button>
             <button
               onClick={() => setActiveTab("candidates")}
               className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group ${
@@ -265,6 +363,64 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 min-w-0">
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+                <p className="text-gray-500 mt-1">Monthly candidate distribution</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <select
+                  value={chartMonth}
+                  onChange={(e) => setChartMonth(Number(e.target.value))}
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                >
+                  {[1,2,3,4,5,6,7,8,9,10,11,12].map((m) => (
+                    <option key={m} value={m}>
+                      {new Date(0, m - 1).toLocaleString("en", { month: "long" })}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={chartYear}
+                  onChange={(e) => setChartYear(Number(e.target.value))}
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                >
+                  {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              {isLoadingChart ? (
+                <div className="p-12 text-center">
+                  <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 mb-4"></div>
+                  <p className="text-gray-500 font-medium">Loading chart data...</p>
+                </div>
+              ) : chartData.length === 0 || chartData.reduce((sum, d) => sum + d.value, 0) === 0 ? (
+                <div className="p-8 text-center text-gray-600">No data available for the selected month and year.</div>
+              ) : (
+                <div className="flex flex-col lg:flex-row items-center gap-8">
+                  <PieChart data={chartData} />
+                  <div className="flex-1">
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Legend</h3>
+                    <ul className="space-y-2">
+                      {chartData.map((d) => (
+                        <li key={d.label} className="flex items-center gap-3">
+                          <span className="inline-block w-3.5 h-3.5 rounded-sm" style={{ backgroundColor: d.color }}></span>
+                          <span className="text-gray-700 font-medium">{d.label}</span>
+                          <span className="ml-auto text-gray-500">{d.value}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {activeTab === "candidates" && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

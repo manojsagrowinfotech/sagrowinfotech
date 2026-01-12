@@ -152,12 +152,13 @@ export default function ContactModal({
       const res = await studentApi.createStudent(payload);
       const msg = res?.data?.message || "Student created successfully";
       setSuccess(msg);
-      // Minimal success toast (auto-close), keep modal open
+      // Minimal success toast, then auto-close modal to avoid blocking UI
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
         resetForm();
-      }, 3000);
+        handleClose();
+      }, 1500);
     } catch (err) {
       setError(
         err?.response?.data?.message || err.message || "Submission failed"
@@ -257,11 +258,7 @@ export default function ContactModal({
                   {error}
                 </div>
               )}
-              {success && (
-                <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2.5 rounded-lg mb-3 text-sm font-medium">
-                  {success}
-                </div>
-              )}
+              {/* Success message is shown via toast for minimal UX; no inline message */}
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="block text-primary-900 text-sm font-semibold mb-1.5">

@@ -14,7 +14,30 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://www.sagrowinfotech.com/",
+    canonical: "https://sagrowinfotech.com/",
+  },
+  openGraph: {
+    title: "Sagrowinfotech - Professional Placement Services",
+    description:
+      "Transform your career with our comprehensive placement assistance. We bridge the gap between education and industry.",
+    url: "https://sagrowinfotech.com/",
+    siteName: "Sagrowinfotech",
+    images: [
+      {
+        url: "https://sagrowinfotech.com/images/ai-placement-ecosystem.png",
+        width: 1200,
+        height: 630,
+        alt: "Sagrowinfotech",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sagrowinfotech - Professional Placement Services",
+    description:
+      "Transform your career with our comprehensive placement assistance. We bridge the gap between education and industry.",
+    images: ["https://sagrowinfotech.com/images/ai-placement-ecosystem.png"],
   },
 };
 
