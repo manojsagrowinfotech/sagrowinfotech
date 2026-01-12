@@ -39,11 +39,6 @@ export const metadata = {
       "Transform your career with our comprehensive placement assistance. We bridge the gap between education and industry.",
     images: ["https://sagrowinfotech.com/images/ai-placement-ecosystem.png"],
   },
-  icons: {
-    icon: "/images/logo-sagrowinfotech-badge.svg",
-    shortcut: "/images/logo-sagrowinfotech-badge.svg",
-    apple: "/images/logo-sagrowinfotech-badge.svg",
-  },
 };
 
 export default function RootLayout({ children }) {
