@@ -12,23 +12,23 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // 🔹 Load user on page refresh
   useEffect(() => {
     const initAuth = async () => {
       const token = Cookies.get("accessToken");
       const emailId = Cookies.get("emailId");
 
       if (token) {
-        // Set axios default header
-        import("@/lib/api").then(({ default: api }) => {
-          api.defaults.headers["Authorization"] = `Bearer ${token}`;
-        });
+        // Set axios auth header
+        const { default: api } = await import("@/lib/api");
+        api.defaults.headers["Authorization"] = `Bearer ${token}`;
 
         if (emailId) {
           try {
             const res = await userApi.getProfile(emailId);
             setUser(res.data);
-          } catch (err) {
-            console.error("Failed to load profile on refresh", err);
+          } catch (error) {
+            console.error("Failed to load user profile on refresh", error);
           }
         }
       }
@@ -39,33 +39,64 @@ export function AuthProvider({ children }) {
     initAuth();
   }, []);
 
-  const login = async (emailId, password) => {
-    const res = await authApi.login({ emailId, password });
-    const { accessToken, refreshToken } = res.data;
+  // 🔹 Login
+  const login = async (emailId, password, skipRedirect = false) => {
+    try {
+      if (user) {
+        throw new Error("User already logged in");
+      }
 
-    Cookies.set("accessToken", accessToken, {
-      secure: true,
-      sameSite: "strict",
-    });
-    Cookies.set("refreshToken", refreshToken, {
-      secure: true,
-      sameSite: "strict",
-    });
-    Cookies.set("emailId", emailId, { secure: true, sameSite: "strict" });
+      const response = await authApi.login({ emailId, password });
+      const { accessToken, refreshToken } = response.data;
 
-    // Fetch profile
-    const profileRes = await userApi.getProfile(emailId);
-    setUser(profileRes.data);
+      Cookies.set("accessToken", accessToken, {
+        secure: true,
+        sameSite: "strict",
+      });
+      Cookies.set("refreshToken", refreshToken, {
+        secure: true,
+        sameSite: "strict",
+      });
+      Cookies.set("emailId", emailId, {
+        secure: true,
+        sameSite: "strict",
+      });
 
-    router.push("/dashboard");
+      // Fetch profile after login
+      try {
+        const profileResponse = await userApi.getProfile(emailId);
+        setUser(profileResponse.data);
+      } catch (error) {
+        console.error("Failed to fetch profile after login", error);
+      }
+
+      if (!skipRedirect) {
+        router.push("/dashboard");
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Login failed", error);
+      throw error;
+    }
   };
 
+  // 🔹 Logout
   const logout = async () => {
-    await authApi.logout();
-    setUser(null);
-    router.push("/");
+    try {
+      await authApi.logout();
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
+      Cookies.remove("emailId");
+      setUser(null);
+      router.push("/");
+    }
   };
 
+  // 🔹 Update profile
   const updateUserProfile = async (data) => {
     try {
       const payload = {
@@ -73,14 +104,15 @@ export function AuthProvider({ children }) {
         mobile_no: data?.mobile_no,
         state: data?.state,
       };
+
       await userApi.updateProfile(payload);
 
-      setUser({
-        ...user,
-        fullName: payload.name ?? user?.fullName,
-        mobileNo: payload.mobile_no ?? user?.mobileNo,
-        state: payload.state ?? user?.state,
-      });
+      setUser((prev) => ({
+        ...prev,
+        fullName: payload.name ?? prev?.fullName,
+        mobileNo: payload.mobile_no ?? prev?.mobileNo,
+        state: payload.state ?? prev?.state,
+      }));
     } catch (error) {
       console.error("Update profile failed", error);
       throw error;

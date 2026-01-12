@@ -3,11 +3,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'https://sagrowinfotech-backend.onrender.com/api/:path*',
+        source: "/api/:path*",
+        destination: "https://sagrowinfotech-backend.onrender.com/api/:path*",
       },
-    ]
+    ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

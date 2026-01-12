@@ -1,20 +1,24 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext'
-import LoginModal from './LoginModal'
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
-  const { user, logout } = useAuth()
-  const router = useRouter()
+  const [isOpen, setIsOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen)
+    setIsOpen(!isOpen);
+  };
+
+  if (pathname && pathname.startsWith("/dashboard")) {
+    return null;
   }
 
   return (
@@ -23,64 +27,149 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo: icon + uppercase text */}
           <Link href="/" className="flex items-center space-x-4">
-            <img src="/images/logo-sagrowinfotech-badge.svg" alt="Sagrow Infotech" className="h-14 w-auto md:h-16" />
-            <span className="text-2xl md:text-3xl font-extrabold tracking-widest text-primary-600">SAGROWINFOTECH</span>
+            <img
+              src="/images/logo-sagrowinfotech-badge.svg"
+              alt="Sagrow Infotech"
+              className="h-14 w-auto md:h-16"
+            />
+            <span className="text-2xl md:text-3xl font-extrabold tracking-widest text-primary-600">
+              SAGROWINFOTECH
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+            >
               Home
             </Link>
-            <Link href="#about" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            <a
+              href="#about"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("about");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
+            >
               About Us
-            </Link>
-            <Link href="#services" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            </a>
+            <a
+              href="#services"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("services");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
+            >
               Services
-            </Link>
-            <Link href="#alumni-review" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            </a>
+            <a
+              href="#alumni-review"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("alumni-review");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
+            >
               Alumni Review
-            </Link>
-            <Link href="#faq" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            </a>
+            <a
+              href="#faq"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("faq");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
+            >
               FAQ
-            </Link>
-            <Link href="#contact" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">
+            </a>
+            <a
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("contact");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
+            >
               Contact
-            </Link>
+            </a>
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsProfileMenuOpen((v) => !v)}
                   className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
                 >
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A4 4 0 019 15h6a4 4 0 013.879 2.804M15 11a3 3 0 10-6 0 3 3 0 006 0z" />
+                  <svg
+                    className="w-5 h-5 text-gray-700"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5.121 17.804A4 4 0 019 15h6a4 4 0 013.879 2.804M15 11a3 3 0 10-6 0 3 3 0 006 0z"
+                    />
                   </svg>
-                  <span className="text-sm font-medium text-gray-700">{user.fullName || 'Profile'}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {user.fullName || "Profile"}
+                  </span>
                 </button>
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                     <button
-                      onClick={() => { setIsProfileMenuOpen(false); router.push('/dashboard') }}
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        router.push("/dashboard");
+                      }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       View profile
                     </button>
                     <button
-                      onClick={() => { setIsProfileMenuOpen(false); const e = new CustomEvent('openUpdateProfile'); window.dispatchEvent(e); }}
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        const e = new CustomEvent("openUpdateProfile");
+                        window.dispatchEvent(e);
+                      }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
-                      Update profile
+                      Profile
                     </button>
                     <button
-                      onClick={() => { setIsProfileMenuOpen(false); const e = new CustomEvent('openChangePassword'); window.dispatchEvent(e); }}
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        const e = new CustomEvent("openChangePassword");
+                        window.dispatchEvent(e);
+                      }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Change password
                     </button>
                     <div className="border-t border-gray-200"></div>
                     <button
-                      onClick={() => { setIsProfileMenuOpen(false); logout(); }}
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        logout();
+                      }}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
                     >
                       Logout
@@ -89,12 +178,12 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <button
-                onClick={() => setIsLoginModalOpen(true)}
+              <Link
+                href="/login"
                 className="px-5 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 Login
-              </button>
+              </Link>
             )}
           </div>
 
@@ -133,41 +222,86 @@ export default function Navbar() {
               >
                 Home
               </Link>
-              <Link
+              <a
                 href="#about"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("about");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 About
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#services"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("services");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Services
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#alumni-review"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("alumni-review");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Alumni Review
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#faq"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("faq");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 FAQ
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#contact"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("contact");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Contact
-              </Link>
+              </a>
               {user ? (
                 <>
                   <Link
@@ -179,8 +313,8 @@ export default function Navbar() {
                   </Link>
                   <button
                     onClick={() => {
-                      logout()
-                      setIsOpen(false)
+                      logout();
+                      setIsOpen(false);
                     }}
                     className="text-left text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
                   >
@@ -188,22 +322,18 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => {
-                    setIsLoginModalOpen(true)
-                    setIsOpen(false)
-                  }}
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
                   className="text-left text-primary-600 hover:text-primary-800 transition-colors font-medium py-2 font-bold"
                 >
                   Login
-                </button>
+                </Link>
               )}
             </div>
           </div>
         )}
       </div>
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </nav>
-  )
+  );
 }
-

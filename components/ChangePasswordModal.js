@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { authApi } from '@/lib/api';
+import { useState } from "react";
+import { authApi } from "@/lib/api";
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+      setError("New passwords do not match");
       return;
     }
 
@@ -27,20 +27,22 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
 
     try {
       // await authApi.changePassword({ currentPassword, newPassword });
-      
-      // Mock success for demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      setSuccess('Password changed successfully');
+      // Mock success for demo
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setSuccess("Password changed successfully");
       setTimeout(() => {
         onClose();
-        setSuccess('');
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
+        setSuccess("");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       }, 1500);
     } catch (err) {
-      setError('Failed to change password. Please check your current password.');
+      setError(
+        "Failed to change password. Please check your current password."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -53,12 +55,24 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Change Password</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Change Password
+        </h2>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
@@ -74,7 +88,10 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="currentPassword">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="currentPassword"
+            >
               Current Password
             </label>
             <input
@@ -88,7 +105,10 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="newPassword">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="newPassword"
+            >
               New Password
             </label>
             <input
@@ -102,7 +122,10 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="confirmPassword"
+            >
               Confirm New Password
             </label>
             <input
@@ -119,10 +142,10 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
             type="submit"
             disabled={isLoading}
             className={`w-full bg-primary-600 text-white font-bold py-2 px-4 rounded-md hover:bg-primary-700 transition-colors ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {isLoading ? 'Changing...' : 'Change Password'}
+            {isLoading ? "Changing..." : "Change Password"}
           </button>
         </form>
       </div>

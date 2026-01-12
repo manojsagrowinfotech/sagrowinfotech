@@ -8,11 +8,14 @@ export default function ReviewCard({ name, testimonial }) {
           </span>
         </div>
         <div>
-          <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{name}</h4>
+          <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
+            {name}
+          </h4>
         </div>
       </div>
-      <p className="text-gray-700 leading-relaxed italic text-sm sm:text-base">"{testimonial}"</p>
+      <p className="text-gray-700 leading-relaxed italic text-sm sm:text-base">
+        "{testimonial}"
+      </p>
     </div>
-  )
+  );
 }
-
