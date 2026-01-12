@@ -12,36 +12,38 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // 🔹 Load user on page refresh
   useEffect(() => {
-    // Check for token and load user profile on mount
-    const loadUser = async () => {
+    const initAuth = async () => {
       const token = Cookies.get("accessToken");
       const emailId = Cookies.get("emailId");
+
       if (token) {
-        try {
-          if (!emailId) {
-            setLoading(false);
-            return;
+        // Set axios auth header
+        const { default: api } = await import("@/lib/api");
+        api.defaults.headers["Authorization"] = `Bearer ${token}`;
+
+        if (emailId) {
+          try {
+            const res = await userApi.getProfile(emailId);
+            setUser(res.data);
+          } catch (error) {
+            console.error("Failed to load user profile on refresh", error);
           }
-          const response = await userApi.getProfile(emailId);
-          setUser(response.data);
-        } catch (error) {
-          console.error("Failed to load user profile", error);
-          // If profile load fails (e.g., token invalid), logout
-          // logout(); // Optional: might want to be less aggressive
         }
       }
+
       setLoading(false);
     };
 
-    loadUser();
+    initAuth();
   }, []);
 
+  // 🔹 Login
   const login = async (emailId, password, skipRedirect = false) => {
     try {
-      // Check if user is already logged in
       if (user) {
-        throw new Error("You are already logged in. Please logout first.");
+        throw new Error("User already logged in");
       }
 
       const response = await authApi.login({ emailId, password });
@@ -55,42 +57,46 @@ export function AuthProvider({ children }) {
         secure: true,
         sameSite: "strict",
       });
-      Cookies.set("emailId", emailId, { secure: true, sameSite: "strict" });
+      Cookies.set("emailId", emailId, {
+        secure: true,
+        sameSite: "strict",
+      });
 
-      // Fetch user profile after successful login since it's not in the login response
+      // Fetch profile after login
       try {
         const profileResponse = await userApi.getProfile(emailId);
         setUser(profileResponse.data);
-      } catch (profileError) {
-        console.error("Failed to fetch user profile after login", profileError);
-        // Fallback: set a minimal user object or handle error
-        // setUser({ email: emailId });
+      } catch (error) {
+        console.error("Failed to fetch profile after login", error);
       }
 
-      // Only redirect if skipRedirect is false
       if (!skipRedirect) {
         router.push("/dashboard");
       }
+
       return { success: true };
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login failed", error);
       throw error;
     }
   };
 
+  // 🔹 Logout
   const logout = async () => {
     try {
-      // await authApi.logout();
+      await authApi.logout();
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
       Cookies.remove("emailId");
       setUser(null);
       router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
     }
   };
 
+  // 🔹 Update profile
   const updateUserProfile = async (data) => {
     try {
       const payload = {
@@ -98,13 +104,15 @@ export function AuthProvider({ children }) {
         mobile_no: data?.mobile_no,
         state: data?.state,
       };
+
       await userApi.updateProfile(payload);
-      setUser({
-        ...user,
-        fullName: payload.name ?? user?.fullName,
-        mobileNo: payload.mobile_no ?? user?.mobileNo,
-        state: payload.state ?? user?.state,
-      });
+
+      setUser((prev) => ({
+        ...prev,
+        fullName: payload.name ?? prev?.fullName,
+        mobileNo: payload.mobile_no ?? prev?.mobileNo,
+        state: payload.state ?? prev?.state,
+      }));
     } catch (error) {
       console.error("Update profile failed", error);
       throw error;
