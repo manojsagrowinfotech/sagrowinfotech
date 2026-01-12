@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { studentApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function ContactModal({
   isOpen: controlledOpen,
   onClose,
   showButton = true,
 }) {
+  const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(false);
 
   // Use controlled open state if provided, otherwise use internal state
@@ -22,7 +24,7 @@ export default function ContactModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
-  const [experience, setExperience] = useState("FRESHER");
+  const [experience, setExperience] = useState("");
   const [years, setYears] = useState("");
   const [state, setState] = useState("");
   const [states, setStates] = useState([]);
@@ -35,10 +37,12 @@ export default function ContactModal({
   const [emailError, setEmailError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [stateError, setStateError] = useState("");
+  const [experienceError, setExperienceError] = useState("");
   const [yearsError, setYearsError] = useState("");
   const [preferredTechnicalDomain, setPreferredTechnicalDomain] = useState("");
   const [preferredTechnicalDomainError, setPreferredTechnicalDomainError] =
     useState("");
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     async function loadOptions() {
@@ -54,7 +58,6 @@ export default function ContactModal({
         setStates(statesData);
         setLevels(levelsData);
         setYearsOptions(yearsData);
-        if (!state && statesData.length) setState(statesData[0].key);
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error("Failed to load options", e);
@@ -67,15 +70,16 @@ export default function ContactModal({
     setName("");
     setEmail("");
     setMobile("");
-    setExperience("FRESHER");
+    setExperience("");
     setYears("");
-    setState(states[0]?.key || "");
+    setState("");
     setError(null);
     setSuccess(null);
     setNameError("");
     setEmailError("");
     setMobileError("");
     setStateError("");
+    setExperienceError("");
     setYearsError("");
     setPreferredTechnicalDomain("");
     setPreferredTechnicalDomainError("");
@@ -86,6 +90,7 @@ export default function ContactModal({
     setEmailError("");
     setMobileError("");
     setStateError("");
+    setExperienceError("");
     setYearsError("");
     setPreferredTechnicalDomainError("");
     let hasError = false;
@@ -97,12 +102,16 @@ export default function ContactModal({
       setEmailError("Please enter a valid email Id");
       hasError = true;
     }
-    if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile)) {
-      setMobileError("Please enter a valid mobile number");
+    if (!mobile.trim() || !/^\d{10}$/.test(mobile)) {
+      setMobileError("Mobile number must be exactly 10 digits");
       hasError = true;
     }
     if (!state) {
       setStateError("Please select your state");
+      hasError = true;
+    }
+    if (!experience) {
+      setExperienceError("Please select experience level");
       hasError = true;
     }
     if (experience === "EXPERIENCED" && !years) {
@@ -143,8 +152,12 @@ export default function ContactModal({
       const res = await studentApi.createStudent(payload);
       const msg = res?.data?.message || "Student created successfully";
       setSuccess(msg);
-      resetForm();
-      setTimeout(() => handleClose(), 1200);
+      // Minimal success toast (auto-close), keep modal open
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+        resetForm();
+      }, 3000);
     } catch (err) {
       setError(
         err?.response?.data?.message || err.message || "Submission failed"
@@ -182,6 +195,14 @@ export default function ContactModal({
 
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          {/* Success Toast */}
+          {success && showToast && (
+            <div className="fixed top-4 right-4 z-[110]">
+              <div className="bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-lg">
+                {success}
+              </div>
+            </div>
+          )}
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 sm:mx-4 p-0 relative overflow-hidden border border-primary-100">
             <button
               onClick={handleClose}
@@ -292,7 +313,8 @@ export default function ContactModal({
                   <input
                     value={mobile}
                     onChange={(e) => {
-                      setMobile(e.target.value);
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setMobile(val);
                       if (mobileError) setMobileError("");
                     }}
                     className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${
@@ -347,6 +369,7 @@ export default function ContactModal({
                         : "focus:ring-2 focus:ring-primary-500"
                     }`}
                   >
+                    <option value="">Select State</option>
                     {states.map((s) => (
                       <option key={s.key} value={s.key}>
                         {s.label}
@@ -366,10 +389,15 @@ export default function ContactModal({
                     value={experience}
                     onChange={(e) => {
                       setExperience(e.target.value);
-                      setYearsError("");
+                      if (experienceError) setExperienceError("");
                     }}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all focus:ring-2 focus:ring-primary-500"
+                    className={`w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white transition-all ${
+                      experienceError
+                        ? "focus:ring-2 border-red-400 focus:ring-red-500"
+                        : "focus:ring-2 focus:ring-primary-500"
+                    }`}
                   >
+                    <option value="">Select Experience Level</option>
                     {levels.length ? (
                       levels.map((l) => (
                         <option key={l.key} value={l.key}>
@@ -387,6 +415,11 @@ export default function ContactModal({
                       </>
                     )}
                   </select>
+                  {experienceError && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {experienceError}
+                    </p>
+                  )}
                 </div>
 
                 {experience === "EXPERIENCED" && (
@@ -406,6 +439,7 @@ export default function ContactModal({
                           : "focus:ring-2 focus:ring-primary-500"
                       }`}
                     >
+                      <option value="">Select Years of Experience</option>
                       {yearsOptions.length
                         ? yearsOptions.map((o) => (
                             <option key={o.key} value={o.key}>

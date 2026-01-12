@@ -15,8 +15,8 @@ export default function ContactForm() {
     if (!name.trim()) return "Please enter your name.";
     if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email))
       return "Please enter a valid email.";
-    if (!mobile.trim() || !/^\+?[0-9\s-]{7,15}$/.test(mobile))
-      return "Please enter a valid mobile number.";
+    if (!mobile.trim() || !/^\d{10}$/.test(mobile))
+      return "Mobile number must be exactly 10 digits.";
     return null;
   }
 
@@ -83,7 +83,12 @@ export default function ContactForm() {
         </label>
         <input
           value={mobile}
-          onChange={(e) => setMobile(e.target.value)}
+          onChange={(e) => {
+            // only allow digits, limit 10 chars
+            let val = e.target.value.replace(/\D/g, "").slice(0, 10);
+            setMobile(val);
+          }}
+          placeholder="Enter your mobile number"
           className="w-full rounded-md border border-gray-300 px-3 py-2"
         />
       </div>

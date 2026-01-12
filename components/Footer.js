@@ -120,7 +120,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Get in Touch</h4>
             <ul className="space-y-2 text-sm mb-4">
-              <li>Email: manoj@sagrowinfotech.com</li>
+              <li>Email: hr@sagrowinfotech.com</li>
               <li>Phone: +91 861 037 1565</li>
               <li className="pt-2">
                 <Link

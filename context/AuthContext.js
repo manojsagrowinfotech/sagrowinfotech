@@ -37,8 +37,13 @@ export function AuthProvider({ children }) {
     loadUser();
   }, []);
 
-  const login = async (emailId, password) => {
+  const login = async (emailId, password, skipRedirect = false) => {
     try {
+      // Check if user is already logged in
+      if (user) {
+        throw new Error("You are already logged in. Please logout first.");
+      }
+
       const response = await authApi.login({ emailId, password });
       const { accessToken, refreshToken } = response.data;
 
@@ -62,7 +67,10 @@ export function AuthProvider({ children }) {
         // setUser({ email: emailId });
       }
 
-      router.push("/dashboard");
+      // Only redirect if skipRedirect is false
+      if (!skipRedirect) {
+        router.push("/dashboard");
+      }
       return { success: true };
     } catch (error) {
       console.error("Login failed:", error);

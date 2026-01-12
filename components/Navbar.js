@@ -3,19 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import LoginModal from "./LoginModal";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  if (pathname && pathname.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-md">
@@ -41,36 +45,71 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <Link
+            <a
               href="#about"
-              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("about");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               About Us
-            </Link>
-            <Link
+            </a>
+            <a
               href="#services"
-              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("services");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               Services
-            </Link>
-            <Link
+            </a>
+            <a
               href="#alumni-review"
-              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("alumni-review");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               Alumni Review
-            </Link>
-            <Link
+            </a>
+            <a
               href="#faq"
-              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("faq");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               FAQ
-            </Link>
-            <Link
+            </a>
+            <a
               href="#contact"
-              className="text-gray-700 hover:text-primary-600 transition-colors font-medium"
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("contact");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+              className="text-gray-700 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               Contact
-            </Link>
+            </a>
             {user ? (
               <div className="relative">
                 <button
@@ -113,7 +152,7 @@ export default function Navbar() {
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
-                      Update profile
+                      Profile
                     </button>
                     <button
                       onClick={() => {
@@ -139,12 +178,12 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <button
-                onClick={() => setIsLoginModalOpen(true)}
+              <Link
+                href="/login"
                 className="px-5 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 Login
-              </button>
+              </Link>
             )}
           </div>
 
@@ -183,41 +222,86 @@ export default function Navbar() {
               >
                 Home
               </Link>
-              <Link
+              <a
                 href="#about"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("about");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 About
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#services"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("services");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Services
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#alumni-review"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("alumni-review");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Alumni Review
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#faq"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("faq");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 FAQ
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#contact"
-                onClick={() => setIsOpen(false)}
-                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setTimeout(() => {
+                    const element = document.getElementById("contact");
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                className="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2 cursor-pointer"
               >
                 Contact
-              </Link>
+              </a>
               {user ? (
                 <>
                   <Link
@@ -238,24 +322,18 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => {
-                    setIsLoginModalOpen(true);
-                    setIsOpen(false);
-                  }}
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
                   className="text-left text-primary-600 hover:text-primary-800 transition-colors font-medium py-2 font-bold"
                 >
                   Login
-                </button>
+                </Link>
               )}
             </div>
           </div>
         )}
       </div>
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
     </nav>
   );
 }

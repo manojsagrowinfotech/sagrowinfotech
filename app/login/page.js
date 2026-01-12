@@ -1,9 +1,12 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { authApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function LoginModal({ isOpen, onClose }) {
+export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState(""); // For forgot password
@@ -40,36 +43,12 @@ export default function LoginModal({ isOpen, onClose }) {
     return () => clearInterval(interval);
   }, [view, timer]);
 
-  useEffect(() => {
-    if (isOpen) {
-      setUsername("");
-      setPassword("");
-      setEmail("");
-      setOtp("");
-      setError("");
-      setSuccess("");
-      setView("login");
-      setRemember(false);
-      setEmailError("");
-      setPasswordError("");
-      setOtpError("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setNewPasswordError("");
-      setConfirmPasswordError("");
-      setLoginSuccess(false);
-      setTimer(0);
-    }
-  }, [isOpen]);
-
   // Check if user is already logged in
   useEffect(() => {
-    if (isOpen && user) {
-      setError("You are already logged in. Please logout first to login with a different account.");
+    if (user) {
+      router.push("/dashboard");
     }
-  }, [isOpen, user]);
-
-  if (!isOpen) return null;
+  }, [user, router]);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -78,9 +57,8 @@ export default function LoginModal({ isOpen, onClose }) {
     setPasswordError("");
     setLoginSuccess(false);
 
-    // Check if user is already logged in
     if (user) {
-      setError("You are already logged in. Please logout first to login with a different account.");
+      router.push("/dashboard");
       return;
     }
 
@@ -97,23 +75,16 @@ export default function LoginModal({ isOpen, onClose }) {
     setIsLoading(true);
 
     try {
-      // Pass skipRedirect=true to prevent immediate redirect
+      // Pass skipRedirect=true to prevent immediate redirect if we want to show success message first
+      // But here we can just let it redirect or handle it manually
       await login(username, password, true);
       setLoginSuccess(true);
       setSuccess("Login successful");
       
-      // Close modal and redirect after showing success message
+      // Redirect to dashboard
       setTimeout(() => {
-        onClose();
-        // Reset state
-        setUsername("");
-        setPassword("");
-        setView("login");
-        setLoginSuccess(false);
-        setSuccess("");
-        // Redirect to dashboard
         router.push("/dashboard");
-      }, 1500);
+      }, 1000);
     } catch (err) {
       const errorMsg = err?.message || "Invalid email or password";
       if (errorMsg.includes("already logged in")) {
@@ -231,53 +202,23 @@ export default function LoginModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 sm:mx-6 p-0 relative overflow-hidden border border-primary-100">
-        <button
-          onClick={() => {
-            onClose();
-            setView("login");
-          }}
-          className="absolute top-4 right-4 text-gray-400 hover:text-primary-600 transition-colors"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <div className="pt-8 px-6 sm:px-8 text-center bg-gradient-to-b from-primary-50 to-white">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 relative overflow-hidden">
+      {/* Background Image/Theme */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/images/ai-placement-ecosystem.png" 
+          alt="Background" 
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 sm:mx-6 p-0 relative z-20 border border-gray-100">
+        <div className="pt-8 px-6 sm:px-8 text-center rounded-t-2xl">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-              <svg
-                className="w-7 h-7 text-primary-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 22c0-3.866 4.477-7 9-7s9 3.134 9 7"
-                />
-              </svg>
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             </div>
-            <div className="text-xl font-bold text-primary-900">
+            <div className="text-xl font-bold text-gray-900">
               {view === "login"
                 ? "USER LOGIN"
                 : view === "forgot"
@@ -290,7 +231,6 @@ export default function LoginModal({ isOpen, onClose }) {
         </div>
         <div className="p-6 sm:p-8 pt-4">
           <div>
-            <div className="h-1.5 bg-gradient-to-r from-primary-400 to-primary-700 rounded-full mb-6"></div>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm font-medium">
                 {error}
@@ -712,7 +652,9 @@ export default function LoginModal({ isOpen, onClose }) {
                       onClick={() => setShowConfirmPassword((v) => !v)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
                       aria-label={
-                        showConfirmPassword ? "Hide password" : "Show password"
+                        showConfirmPassword
+                          ? "Hide password"
+                          : "Show password"
                       }
                     >
                       {showConfirmPassword ? (
