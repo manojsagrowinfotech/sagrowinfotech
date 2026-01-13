@@ -213,6 +213,15 @@ export default function LoginPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 sm:mx-6 p-0 relative z-20 border border-gray-100">
+        <Link
+          href="/"
+          aria-label="Back to Home"
+          className="absolute top-4 left-4 inline-flex items-center justify-center w-9 h-9 rounded-xl text-gray-600 hover:text-primary-700 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </Link>
         <div className="pt-8 px-6 sm:px-8 text-center rounded-t-2xl">
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
