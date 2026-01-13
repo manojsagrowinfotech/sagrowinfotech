@@ -19,6 +19,9 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [filters, setFilters] = useState({
     emailId: "",
@@ -206,14 +209,16 @@ export default function Dashboard() {
   };
 
   const isAdmin = (user?.role || "").toLowerCase() === "admin";
-  const handleDelete = async (id) => {
-    const ok = window.confirm(
-      "Are you sure you want to delete this candidate? This action cannot be undone."
-    );
-    if (!ok) return;
+  const openDelete = (student) => {
+    setDeleteTarget(student);
+    setIsDeleteOpen(true);
+  };
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
     try {
-      await studentApi.deleteStudent(id);
-      setStudents((prev) => prev.filter((s) => s.id !== id));
+      setIsDeleting(true);
+      await studentApi.deleteStudent(deleteTarget.id);
+      setStudents((prev) => prev.filter((s) => s.id !== deleteTarget.id));
       setPagination((p) => ({
         ...p,
         totalRecords: Math.max(0, (p.totalRecords || 0) - 1),
@@ -221,6 +226,10 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Delete failed", err);
       alert("Failed to delete candidate. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteOpen(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -569,7 +578,17 @@ function PieChart({ data, size = 240, thickness = 28 }) {
                                 <span className="text-xs text-gray-600">{student.preferredTechnicalDomain || "-"}</span>
                               </div>
                             </div>
-                            <div className="flex-shrink-0">
+                            <div className="flex-shrink-0 flex items-center gap-2">
+                              {isAdmin && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openDelete(student); }}
+                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50"
+                                  title="Delete Candidate"
+                                  aria-label="Delete Candidate"
+                                >
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" /></svg>
+                                </button>
+                              )}
                               <button
                                 onClick={() => { setSelectedStudent(student); setIsDetailsOpen(true); }}
                                 className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-semibold hover:bg-primary-700 transition-colors"
@@ -658,9 +677,10 @@ function PieChart({ data, size = 240, thickness = 28 }) {
                               {isAdmin && (
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(student.id); }}
-                                    className="text-gray-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                                    onClick={(e) => { e.stopPropagation(); openDelete(student); }}
+                                    className="text-red-600 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-lg"
                                     title="Delete Candidate"
+                                    aria-label="Delete Candidate"
                                   >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M6 7h12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2" /></svg>
                                   </button>
@@ -812,6 +832,30 @@ function PieChart({ data, size = 240, thickness = 28 }) {
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 transition-colors"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteOpen && deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setIsDeleteOpen(false)}></div>
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this candidate? This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsDeleteOpen(false)}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

@@ -202,7 +202,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 relative overflow-hidden">
       {/* Background Image/Theme */}
       <div className="absolute inset-0 z-0">
         <img 
