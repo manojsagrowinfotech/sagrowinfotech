@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { studentApi, excelApi } from "@/lib/api";
@@ -16,7 +16,12 @@ export default function Dashboard() {
   const [chartMonth, setChartMonth] = useState(() => new Date().getMonth() + 1);
   const [chartYear, setChartYear] = useState(() => new Date().getFullYear());
   const [isLoadingChart, setIsLoadingChart] = useState(true);
-  const [chartData, setChartData] = useState([]);
+  const [experienceChart, setExperienceChart] = useState([]);
+  const [stateChart, setStateChart] = useState([]);
+  const [chartSegment, setChartSegment] = useState("experience");
+  const [theme, setTheme] = useState("light");
+  const [chartSize, setChartSize] = useState(240);
+  const chartRef = useRef(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -120,26 +125,60 @@ export default function Dashboard() {
           order: "ASC",
         });
         const records = res?.data?.records || [];
-        const fresher = records.filter((r) =>
-          (r.experienceLevel || "").toUpperCase().startsWith("F")
-        ).length;
-        const experienced = records.filter((r) =>
-          (r.experienceLevel || "").toUpperCase().startsWith("E")
-        ).length;
+        const fresher = records.filter((r) => (r.experienceLevel || "").toUpperCase().startsWith("F")).length;
+        const experienced = records.filter((r) => (r.experienceLevel || "").toUpperCase().startsWith("E")).length;
         const other = Math.max(0, records.length - fresher - experienced);
-        setChartData([
-          { label: "Fresher", value: fresher, color: "#2563eb" },
-          { label: "Experienced", value: experienced, color: "#16a34a" },
-          ...(other > 0 ? [{ label: "Other/Unknown", value: other, color: "#6b7280" }] : []),
+        setExperienceChart([
+          { label: "Fresher", value: fresher },
+          { label: "Experienced", value: experienced },
+          ...(other > 0 ? [{ label: "Other/Unknown", value: other }] : []),
         ]);
+        const states = records.reduce((acc, r) => {
+          const st = r.state || "Unknown";
+          acc[st] = (acc[st] || 0) + 1;
+          return acc;
+        }, {});
+        const stateArr = Object.entries(states).map(([label, value]) => ({ label, value }));
+        setStateChart(stateArr);
       } catch (e) {
-        setChartData([]);
+        setExperienceChart([]);
+        setStateChart([]);
       } finally {
         setIsLoadingChart(false);
       }
     };
     if (user) fetchChartData();
   }, [user, chartMonth, chartYear]);
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+    const initial = saved === "dark" ? "dark" : "light";
+    setTheme(initial);
+    if (initial === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    if (next === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", next);
+  };
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el || !window.ResizeObserver) return;
+    const obs = new ResizeObserver((entries) => {
+      const w = entries[0].contentRect.width;
+      setChartSize(Math.max(160, Math.min(360, w)));
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const downloadExcel = async () => {
     if (!filters.fromDate || !filters.toDate) {
@@ -256,7 +295,7 @@ export default function Dashboard() {
   );
 }
 
-function PieChart({ data, size = 240, thickness = 28 }) {
+function PieChart({ data, size = 240, thickness = 28, trackColor = "#f3f4f6" }) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -265,7 +304,7 @@ function PieChart({ data, size = 240, thickness = 28 }) {
     <div className="flex items-center justify-center">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <g transform={`translate(${size / 2}, ${size / 2})`}>
-          <circle r={radius} fill="none" stroke="#f3f4f6" strokeWidth={thickness} />
+          <circle r={radius} fill="none" stroke={trackColor} strokeWidth={thickness} />
           {data.map((d) => {
             const segment = total ? (d.value / total) * circumference : 0;
             const dasharray = `${segment} ${circumference - segment}`;
@@ -288,11 +327,40 @@ function PieChart({ data, size = 240, thickness = 28 }) {
     </div>
   );
 }
+function PieChartCut({ data, size = 240 }) {
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const radius = size / 2;
+  let angle = 0;
+  const toXY = (a) => {
+    const x = Math.cos(a) * radius;
+    const y = Math.sin(a) * radius;
+    return [x, y];
+  };
   return (
-    <div className="container-custom py-6 min-h-screen flex flex-col lg:flex-row gap-8 bg-gray-50/50">
+    <div className="flex items-center justify-center">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <g transform={`translate(${size / 2}, ${size / 2})`}>
+          {data.map((d) => {
+            const slice = total ? (d.value / total) * Math.PI * 2 : 0;
+            const start = angle;
+            const end = angle + slice;
+            const large = slice > Math.PI ? 1 : 0;
+            const [x1, y1] = toXY(start);
+            const [x2, y2] = toXY(end);
+            angle = end;
+            const dPath = `M 0 0 L ${x1} ${y1} A ${radius} ${radius} 0 ${large} 1 ${x2} ${y2} Z`;
+            return <path key={d.label} d={dPath} fill={d.color} />;
+          })}
+        </g>
+      </svg>
+    </div>
+  );
+}
+  return (
+    <div className="container-custom py-6 min-h-screen flex flex-col lg:flex-row gap-8 bg-gray-50/50 dark:bg-gray-900">
       {/* Left Sidebar */}
       <aside className="w-full lg:w-72 flex-shrink-0">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:sticky lg:top-24">
           {/* Profile Section */}
           <div className="flex flex-col items-center mb-8 pb-8 border-b border-gray-100">
             <div 
@@ -308,8 +376,8 @@ function PieChart({ data, size = 240, thickness = 28 }) {
                 <span className="text-white text-xs font-bold uppercase tracking-wider">Edit</span>
               </div>
             </div>
-            <h3 className="font-bold text-gray-900 text-xl text-center mb-1">{user.fullName}</h3>
-            <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-medium uppercase tracking-wide mb-3">{user.role}</span>
+            <h3 className="font-bold text-gray-900 dark:text-gray-100 text-xl text-center mb-1">{user.fullName}</h3>
+            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full font-medium uppercase tracking-wide mb-3">{user.role}</span>
             <button 
               onClick={() => setIsUpdateProfileOpen(true)}
               className="text-sm text-primary-600 font-semibold hover:text-primary-800 hover:underline transition-all"
@@ -378,14 +446,14 @@ function PieChart({ data, size = 240, thickness = 28 }) {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-                <p className="text-gray-500 mt-1">Monthly candidate distribution</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard Overview</h1>
+                <p className="text-gray-500 dark:text-gray-400 mt-1">Monthly candidate distribution</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
                 <select
                   value={chartMonth}
                   onChange={(e) => setChartMonth(Number(e.target.value))}
-                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-gray-100"
                 >
                   {[1,2,3,4,5,6,7,8,9,10,11,12].map((m) => (
                     <option key={m} value={m}>
@@ -396,37 +464,90 @@ function PieChart({ data, size = 240, thickness = 28 }) {
                 <select
                   value={chartYear}
                   onChange={(e) => setChartYear(Number(e.target.value))}
-                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-gray-100"
                 >
                   {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i).map((y) => (
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden w-full sm:w-auto">
+                    <button
+                      onClick={() => setChartSegment("experience")}
+                      className={`px-3 py-2 text-sm flex-1 ${chartSegment === "experience" ? "bg-primary-600 text-white" : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"}`}
+                    >
+                      Experience
+                    </button>
+                    <button
+                      onClick={() => setChartSegment("state")}
+                      className={`px-3 py-2 text-sm flex-1 ${chartSegment === "state" ? "bg-primary-600 text-white" : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"}`}
+                    >
+                      State
+                    </button>
+                  </div>
+                  <button
+                    onClick={toggleTheme}
+                    aria-label="Toggle theme"
+                    className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm w-full sm:w-auto"
+                  >
+                    {theme === "dark" ? "Light" : "Dark"}
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
               {isLoadingChart ? (
                 <div className="p-12 text-center">
                   <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 mb-4"></div>
-                  <p className="text-gray-500 font-medium">Loading chart data...</p>
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">Loading chart data...</p>
                 </div>
-              ) : chartData.length === 0 || chartData.reduce((sum, d) => sum + d.value, 0) === 0 ? (
-                <div className="p-8 text-center text-gray-600">No data available for the selected month and year.</div>
+              ) : (() => {
+                const dataset = chartSegment === "experience" ? experienceChart : stateChart;
+                const total = dataset.reduce((sum, d) => sum + d.value, 0);
+                return total === 0;
+              })() ? (
+                <div className="p-8 text-center text-gray-600 dark:text-gray-300">No data available for the selected month and year.</div>
               ) : (
-                <div className="flex flex-col lg:flex-row items-center gap-8">
-                  <PieChart data={chartData} />
-                  <div className="flex-1">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Legend</h3>
-                    <ul className="space-y-2">
-                      {chartData.map((d) => (
-                        <li key={d.label} className="flex items-center gap-3">
-                          <span className="inline-block w-3.5 h-3.5 rounded-sm" style={{ backgroundColor: d.color }}></span>
-                          <span className="text-gray-700 font-medium">{d.label}</span>
-                          <span className="ml-auto text-gray-500">{d.value}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8">
+                  {(() => {
+                    const isDark = theme === "dark";
+                    const palette = {
+                      experience: {
+                        Fresher: isDark ? "#60a5fa" : "#2563eb",
+                        Experienced: isDark ? "#34d399" : "#16a34a",
+                        "Other/Unknown": isDark ? "#d1d5db" : "#6b7280",
+                      },
+                      states: isDark
+                        ? ["#60a5fa","#34d399","#fbbf24","#f87171","#a78bfa","#67e8f9","#86efac","#c084fc","#fda4af","#2dd4bf"]
+                        : ["#2563eb","#16a34a","#f59e0b","#ef4444","#8b5cf6","#06b6d4","#22c55e","#a855f7","#fb7185","#14b8a6"],
+                    };
+                    const dataset = chartSegment === "experience" ? experienceChart : stateChart;
+                    const colored = chartSegment === "experience"
+                      ? dataset.map((d) => ({ ...d, color: palette.experience[d.label] }))
+                      : dataset.map((d, i) => ({ ...d, color: palette.states[i % palette.states.length] }));
+                    return (
+                      <>
+                        <div ref={chartRef} className="w-full">
+                          <PieChartCut
+                            data={colored}
+                            size={chartSize}
+                          />
+                        </div>
+                        <div className="w-full lg:flex-1 sm:max-h-64 sm:overflow-auto">
+                          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wide mb-3">Legend</h3>
+                          <ul className="space-y-2">
+                            {colored.map((d) => (
+                              <li key={d.label} className="flex items-center gap-3">
+                                <span className="inline-block w-3.5 h-3.5 rounded-sm" style={{ backgroundColor: d.color }}></span>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">{d.label}</span>
+                                <span className="ml-auto text-gray-500 dark:text-gray-400">{d.value}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </div>

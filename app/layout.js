@@ -44,11 +44,17 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="antialiased min-h-screen flex flex-col">
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();",
+          }}
+        />
         <AuthProvider>
           <ContactModalProvider>
             <Navbar />
-            <main className="min-h-screen">{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </ContactModalProvider>
         </AuthProvider>
